@@ -7,6 +7,8 @@ class XiangqiGame {
         this.capturedPieces = { red: [], black: [] };
         this.gameOver = false;
         this.kingPositions = { red: [9, 4], black: [0, 4] }; // Starting positions of kings
+        this.inCheck = { red: false, black: false }; // Track check status
+        this.fullRenderNeeded = true; // Flag to indicate if full render is needed
         this.initializeGame();
     }
 
@@ -82,30 +84,35 @@ class XiangqiGame {
 
     renderBoard() {
         const gameBoard = document.getElementById('game-board');
-        gameBoard.innerHTML = '';
         
-        // Add the horizontal and vertical lines to create the board
-        this.createBoardLines();
+        // Only clear board lines and static elements, not pieces
+        const existingPieces = gameBoard.querySelectorAll('.piece');
         
-        // Add palace diagonals
-        this.createPalaceDiagonals();
-        
-        // Add river area
-        this.createRiver();
-        
-        // Add intersections and pieces
-        for (let row = 0; row < 10; row++) {
-            for (let col = 0; col < 9; col++) {
-                // Add intersections
-                this.addIntersection(row, col);
-                
-                // Add piece if it exists
-                const piece = this.board[row][col];
-                if (piece) {
-                    this.addPieceAt(row, col, piece);
+        // Clear only if it's a full render (not just updating positions)
+        if (existingPieces.length === 0 || this.fullRenderNeeded) {
+            gameBoard.innerHTML = '';
+            
+            // Add the horizontal and vertical lines to create the board
+            this.createBoardLines();
+            
+            // Add palace diagonals
+            this.createPalaceDiagonals();
+            
+            // Add river area
+            this.createRiver();
+            
+            // Add intersections
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 9; col++) {
+                    this.addIntersection(row, col);
                 }
             }
+            
+            this.fullRenderNeeded = false;
         }
+        
+        // Update or create pieces
+        this.updatePieces();
         
         // Highlight selected piece if one is selected
         if (this.selectedPiece) {
@@ -273,6 +280,61 @@ class XiangqiGame {
         gameBoard.appendChild(pieceElement);
     }
 
+    updatePieces() {
+        const gameBoard = document.getElementById('game-board');
+        const existingPieces = gameBoard.querySelectorAll('.piece');
+        const pieceMap = new Map();
+        
+        // Clear all highlighted intersections
+        const highlightedIntersections = gameBoard.querySelectorAll('.intersection.highlighted');
+        highlightedIntersections.forEach(intersection => {
+            intersection.classList.remove('highlighted');
+        });
+        
+        // Create a map of existing pieces by their position
+        existingPieces.forEach(piece => {
+            const row = parseInt(piece.dataset.row);
+            const col = parseInt(piece.dataset.col);
+            pieceMap.set(`${row}-${col}`, piece);
+        });
+        
+        // Update or create pieces based on current board state
+        for (let row = 0; row < 10; row++) {
+            for (let col = 0; col < 9; col++) {
+                const piece = this.board[row][col];
+                const key = `${row}-${col}`;
+                const existingPiece = pieceMap.get(key);
+                
+                if (piece) {
+                    if (existingPiece) {
+                        // Update existing piece if needed
+                        existingPiece.textContent = this.getPieceCharacter(piece.type, piece.color);
+                        existingPiece.className = `piece ${piece.color} ${piece.type}`;
+                        existingPiece.dataset.row = row;
+                        existingPiece.dataset.col = col;
+                        
+                        // Update position with animation
+                        // Use requestAnimationFrame to ensure transition works properly
+                        requestAnimationFrame(() => {
+                            existingPiece.style.left = `${col * 70}px`;
+                            existingPiece.style.top = `${row * 70}px`;
+                        });
+                        
+                        pieceMap.delete(key);
+                    } else {
+                        // Create new piece
+                        this.addPieceAt(row, col, piece);
+                    }
+                }
+            }
+        }
+        
+        // Remove pieces that no longer exist on the board
+        pieceMap.forEach(piece => {
+            piece.remove();
+        });
+    }
+
     getPieceCharacter(type, color) {
         // Using Chinese characters for pieces
         const chars = {
@@ -341,6 +403,9 @@ class XiangqiGame {
         
         const piece = this.board[row][col];
         
+        // Add click feedback
+        this.addClickFeedback(row, col);
+        
         // If a piece is already selected
         if (this.selectedPiece) {
             const [selectedRow, selectedCol] = this.selectedPiece;
@@ -354,28 +419,86 @@ class XiangqiGame {
             
             // Check if the move is valid
             if (this.isValidMove(selectedRow, selectedCol, row, col)) {
-                // Capture piece if exists
-                if (piece && piece.color !== this.currentPlayer) {
-                    this.capturedPieces[this.currentPlayer].push(piece);
-                    if (piece.type === 'king') {
+                // Temporarily make the move to check if it resolves check
+                const originalPiece = this.board[row][col];
+                const movingPiece = this.board[selectedRow][selectedCol];
+                this.board[row][col] = movingPiece;
+                this.board[selectedRow][selectedCol] = null;
+                
+                // Update king position if king was moved
+                if (movingPiece.type === 'king') {
+                    this.kingPositions[this.currentPlayer] = [row, col];
+                }
+                
+                // Check if the current player is in check and if this move resolves it
+                const wouldBeInCheck = this.isInCheck(this.currentPlayer);
+                
+                // If current player is in check and this move doesn't resolve it, illegal move
+                if (this.inCheck[this.currentPlayer] && wouldBeInCheck) {
+                    // Restore the board
+                    this.board[selectedRow][selectedCol] = movingPiece;
+                    this.board[row][col] = originalPiece;
+                    
+                    // Restore king position if needed
+                    if (movingPiece.type === 'king') {
+                        this.kingPositions[this.currentPlayer] = [selectedRow, selectedCol];
+                    }
+                    
+                    // Show a message that this move is illegal
+                    this.showIllegalMoveAlert();
+                    return;
+                }
+                
+                // If the move would put the current player in check, it's illegal
+                if (!this.inCheck[this.currentPlayer] && wouldBeInCheck) {
+                    // Restore the board
+                    this.board[selectedRow][selectedCol] = movingPiece;
+                    this.board[row][col] = originalPiece;
+                    
+                    // Restore king position if needed
+                    if (movingPiece.type === 'king') {
+                        this.kingPositions[this.currentPlayer] = [selectedRow, selectedCol];
+                    }
+                    
+                    // Show a message that this move is illegal
+                    this.showIllegalMoveAlert();
+                    return;
+                }
+                
+                // Move is valid, make it permanent
+                if (originalPiece && originalPiece.color !== this.currentPlayer) {
+                    this.capturedPieces[this.currentPlayer].push(originalPiece);
+                    // Show capture alert when a piece is captured
+                    this.showCaptureAlert();
+                    if (originalPiece.type === 'king') {
                         this.gameOver = true;
                         const winner = this.currentPlayer === 'red' ? '红方' : '黑方';
                         alert(`${winner}获胜！`);
                     }
                 }
                 
-                // Move the piece
-                this.board[row][col] = this.board[selectedRow][selectedCol];
-                this.board[selectedRow][selectedCol] = null;
-                
-                // Update king position if king was moved
-                if (this.board[row][col] && this.board[row][col].type === 'king') {
-                    this.kingPositions[this.currentPlayer] = [row, col];
-                }
+                // Add moving animation class to the piece
+                const gameBoard = document.getElementById('game-board');
+                const pieceElements = gameBoard.querySelectorAll('.piece');
+                pieceElements.forEach(pieceEl => {
+                    if (parseInt(pieceEl.dataset.row) === row && parseInt(pieceEl.dataset.col) === col) {
+                        pieceEl.classList.add('moving');
+                        // Remove the animation class after the animation completes
+                        setTimeout(() => {
+                            pieceEl.classList.remove('moving');
+                        }, 1700);
+                    }
+                });
                 
                 // Switch player
                 this.currentPlayer = this.currentPlayer === 'red' ? 'black' : 'red';
                 this.selectedPiece = null;
+                
+                // Check for check condition after the move
+                this.inCheck[this.currentPlayer] = this.isInCheck(this.currentPlayer);
+                if (this.inCheck[this.currentPlayer]) {
+                    this.showCheckAlert();
+                }
                 
                 this.renderBoard();
                 return;
@@ -414,17 +537,58 @@ class XiangqiGame {
         for (let row = 0; row < 10; row++) {
             for (let col = 0; col < 9; col++) {
                 if (this.isValidMove(fromRow, fromCol, row, col)) {
-                    // Highlight the intersection
-                    const intersections = gameBoard.querySelectorAll('.intersection');
-                    intersections.forEach(intersection => {
-                        if (parseInt(intersection.dataset.row) === row && 
-                            parseInt(intersection.dataset.col) === col) {
-                            intersection.classList.add('highlighted');
-                        }
-                    });
+                    // Check if there's an opponent piece at this position (capture move)
+                    const targetPiece = this.board[row][col];
+                    if (targetPiece && targetPiece.color !== this.currentPlayer) {
+                        // Highlight the targeted piece
+                        const pieces = gameBoard.querySelectorAll('.piece');
+                        pieces.forEach(piece => {
+                            if (parseInt(piece.dataset.row) === row && 
+                                parseInt(piece.dataset.col) === col) {
+                                piece.classList.add('targeted');
+                            }
+                        });
+                    } else {
+                        // Highlight the intersection for empty squares
+                        const intersections = gameBoard.querySelectorAll('.intersection');
+                        intersections.forEach(intersection => {
+                            if (parseInt(intersection.dataset.row) === row && 
+                                parseInt(intersection.dataset.col) === col) {
+                                intersection.classList.add('highlighted');
+                            }
+                        });
+                    }
                 }
             }
         }
+    }
+
+    addClickFeedback(row, col) {
+        const gameBoard = document.getElementById('game-board');
+        
+        // Create a temporary visual feedback at the clicked position
+        const feedback = document.createElement('div');
+        feedback.className = 'click-feedback';
+        feedback.style.position = 'absolute';
+        feedback.style.left = `${col * 70}px`;
+        feedback.style.top = `${row * 70}px`;
+        feedback.style.width = '20px';
+        feedback.style.height = '20px';
+        feedback.style.borderRadius = '50%';
+        feedback.style.backgroundColor = 'rgba(255, 215, 0, 0.6)';
+        feedback.style.transform = 'translate(-50%, -50%)';
+        feedback.style.pointerEvents = 'none';
+        feedback.style.zIndex = '10';
+        feedback.style.animation = 'clickRipple 0.6s ease-out';
+        
+        gameBoard.appendChild(feedback);
+        
+        // Remove the feedback after animation completes
+        setTimeout(() => {
+            if (feedback.parentNode) {
+                feedback.parentNode.removeChild(feedback);
+            }
+        }, 600);
     }
 
     isValidMove(fromRow, fromCol, toRow, toCol) {
@@ -694,7 +858,88 @@ class XiangqiGame {
         this.capturedPieces = { red: [], black: [] };
         this.gameOver = false;
         this.kingPositions = { red: [9, 4], black: [0, 4] };
+        this.inCheck = { red: false, black: false };
+        this.fullRenderNeeded = true; // Need full render for reset
         this.renderBoard();
+    }
+
+    isInCheck(playerColor) {
+        // Get the king's position
+        const kingPos = this.kingPositions[playerColor];
+        if (!kingPos) return false;
+        
+        const [kingRow, kingCol] = kingPos;
+        
+        // Check if any opponent piece can attack the king
+        for (let row = 0; row < 10; row++) {
+            for (let col = 0; col < 9; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.color !== playerColor) {
+                    // Temporarily switch player to check if opponent can move to king's position
+                    const originalPlayer = this.currentPlayer;
+                    this.currentPlayer = piece.color;
+                    
+                    const canAttackKing = this.isValidMove(row, col, kingRow, kingCol);
+                    
+                    // Restore original player
+                    this.currentPlayer = originalPlayer;
+                    
+                    if (canAttackKing) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    showCheckAlert() {
+        const checkAlert = document.getElementById('check-alert');
+        checkAlert.style.display = 'block';
+        
+        // Auto-hide after 2 seconds
+        setTimeout(() => {
+            checkAlert.style.display = 'none';
+        }, 2000);
+    }
+
+    showCaptureAlert() {
+        const captureAlert = document.getElementById('capture-alert');
+        captureAlert.style.display = 'block';
+        
+        // Auto-hide after 1.5 seconds
+        setTimeout(() => {
+            captureAlert.style.display = 'none';
+        }, 1500);
+    }
+
+    showIllegalMoveAlert() {
+        // Create a temporary alert for illegal moves
+        const alert = document.createElement('div');
+        alert.className = 'illegal-move-alert';
+        alert.textContent = '不能这样走！必须解除将军状态';
+        alert.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1001;
+            font-weight: bold;
+        `;
+        
+        document.body.appendChild(alert);
+        
+        // Auto-hide after 1.5 seconds
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 1500);
     }
 }
 
