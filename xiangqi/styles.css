@@ -1,0 +1,236 @@
+/* Chinese Chess (Xiangqi) Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0d9b5; /* Tan background color resembling a wooden board */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: #5e3c0d;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #e6d3a7;
+    border-radius: 8px;
+}
+
+.current-player {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #5e3c0d;
+}
+
+#current-player {
+    color: #d63031;
+    text-transform: uppercase;
+}
+
+#reset-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #5e3c0d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#reset-btn:hover {
+    background-color: #7d5d1b;
+}
+
+.game-board {
+    position: relative;
+    width: 560px; /* 8 intersections * 70px */
+    height: 630px; /* 9 intersections * 70px */
+    background-color: #e2c9a0; /* Wooden board color */
+    border: 2px solid #5e3c0d;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    margin: 0 auto;
+}
+
+/* Horizontal lines */
+.board-line {
+    position: absolute;
+    background-color: #000;
+}
+
+.board-line.horizontal {
+    width: 100%;
+    height: 1px;
+    left: 0;
+}
+
+/* Vertical lines */
+.board-line.vertical {
+    width: 1px;
+    height: 100%;
+    top: 0;
+}
+
+/* River area */
+.river-area {
+    position: absolute;
+    width: 100%;
+    height: 70px; /* One grid spacing */
+    top: 245px; /* Between row 4 and 5 (4.5 * 70 - 70) */
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* Palace diagonals */
+.palace-diagonal {
+    position: absolute;
+    z-index: 1;
+}
+
+/* Intersections where pieces are placed */
+.intersection {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #000;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    cursor: pointer;
+}
+
+.intersection.highlighted {
+    background-color: #32CD32; /* Green highlight for possible moves */
+}
+
+.intersection.selected {
+    background-color: #FFD700; /* Gold highlight for selected piece */
+    box-shadow: 0 0 5px #FFD700;
+}
+
+/* Pieces */
+.piece {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: 'STXingkai', '华文行楷', 'KaiTi', '楷体', serif;
+    border: 2px solid #333;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    text-align: center;
+    line-height: 1;
+}
+
+.piece.red {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.piece.black {
+    background-color: #333;
+    color: white;
+}
+
+.captured-pieces {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #e6d3a7;
+    border-radius: 8px;
+}
+
+.captured-pieces h3 {
+    margin: 5px 0;
+    color: #5e3c0d;
+}
+
+.captured-pieces div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+}
+
+.captured-piece-item {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-family: 'STXingkai', '华文行楷', 'KaiTi', '楷体', serif;
+    margin: 2px;
+    border: 1px solid #333;
+}
+
+.captured-piece-item.red {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.captured-piece-item.black {
+    background-color: #333;
+    color: white;
+}
+
+/* Responsive design */
+@media (max-width: 700px) {
+    .game-board {
+        width: 450px; /* 9 intersections * 50px */
+        height: 500px; /* 10 intersections * 50px */
+    }
+    
+    .piece {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+        font-family: 'STXingkai', '华文行楷', 'KaiTi', '楷体', serif;
+    }
+    
+    .intersection {
+        width: 8px;
+        height: 8px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    .captured-pieces {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
