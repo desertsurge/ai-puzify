@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>迷宫游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="nav-bar">
+            <a href="../index.html" class="back-button">
+                <i class="arrow-left"></i> 返回主界面
+            </a>
+        </div>
+        <header>
+            <h1>迷宫游戏</h1>
+            <div class="game-info">
+                <div class="level">关卡: <span id="level">1</span></div>
+                <div class="moves">步数: <span id="moves">0</span></div>
+                <div class="timer">时间: <span id="timer">00:00</span></div>
+            </div>
+        </header>
+        
+        <div class="game-container">
+            <div class="maze-container">
+                <div id="maze" class="maze"></div>
+                <div id="player" class="player"></div>
+                <div id="goal" class="goal"></div>
+            </div>
+            
+            <div class="controls">
+                <button id="restart-btn">重新开始</button>
+                <button id="next-level-btn" style="display: none;">下一关</button>
+            </div>
+            
+            <div class="instructions">
+                <h3>游戏说明</h3>
+                <ul>
+                    <li>使用方向键或WASD控制角色移动</li>
+                    <li>找到通往终点的路径</li>
+                    <li>避开墙壁，到达终点获胜</li>
+                    <li>按Z键可以撤销上一步移动</li>
+                    <li>在触摸设备上可以滑动控制角色移动</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="win-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>恭喜通关！</h2>
+                <p>步数: <span id="win-moves"></span></p>
+                <p>用时: <span id="win-time"></span></p>
+                <button id="play-again-btn">再玩一次</button>
+                <button id="next-level-modal-btn">下一关</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
