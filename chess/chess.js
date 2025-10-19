@@ -184,8 +184,16 @@ class ChessGame {
             return;
         }
         
-        // 选择棋子
+        // 选择棋子（如果是己方棋子）
         if (clickedPiece && clickedPiece.color === this.currentPlayer) {
+            // 被将军时，只能选择能解除将军的棋子
+            if (this.inCheck[this.currentPlayer]) {
+                const validMoves = this.calculateValidMoves(row, col);
+                if (validMoves.length === 0) {
+                    // 这个棋子不能解除将军，不允许选择
+                    return;
+                }
+            }
             this.selectPiece(row, col);
         }
     }
@@ -264,6 +272,7 @@ class ChessGame {
                 break;
         }
         
+        // 过滤掉不合法的走法（包括不能解除将军状态的走法）
         return moves.filter(move => this.isMoveValid(row, col, move.row, move.col));
     }
     
@@ -367,8 +376,25 @@ class ChessGame {
     }
     
     isMoveValid(fromRow, fromCol, toRow, toCol) {
-        // 简化验证 - 实际游戏中需要更复杂的验证
-        return true;
+        const piece = this.board[fromRow][fromCol];
+        if (!piece) return false;
+        
+        // 模拟走棋来检查是否合法
+        const originalPiece = this.board[toRow][toCol];
+        
+        // 临时执行移动
+        this.board[toRow][toCol] = piece;
+        this.board[fromRow][fromCol] = null;
+        
+        // 检查移动后己方王是否被将军
+        const kingInCheck = this.isKingInCheck(piece.color);
+        
+        // 恢复棋盘状态
+        this.board[fromRow][fromCol] = piece;
+        this.board[toRow][toCol] = originalPiece;
+        
+        // 如果移动后己方王仍然被将军，则走棋不合法
+        return !kingInCheck;
     }
     
     isValidMove(row, col) {
