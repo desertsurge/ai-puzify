@@ -1,0 +1,312 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, "Microsoft YaHei", sans-serif;
+    margin: 0;
+    padding: 2px;  /* 减少整体边距 */
+    background-color: #f0e6d2;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    text-align: center;
+    background: white;
+    padding: 8px;  /* 减少容器内边距 */
+    border-radius: 6px;  /* 减少圆角 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* 减少阴影 */
+    max-width: 100%;
+    width: auto;
+    margin: 2px;  /* 减少容器外边距 */
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 8px;  /* 减少标题下边距 */
+    font-size: 1.3em;  /* 减小标题字体 */
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;  /* 减少间隔 */
+    margin-bottom: 8px;  /* 减少下边距 */
+    padding: 0 4px;  /* 减少内边距 */
+}
+
+.current-player {
+    font-size: 14px;  /* 减小字体 */
+    font-weight: bold;
+    flex: 1;
+    min-width: 100px;  /* 减小最小宽度 */
+    text-align: left;
+}
+
+.score {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;  /* 减少间隔 */
+    font-size: 12px;  /* 减小字体 */
+    flex: 1;
+    min-width: 100px;  /* 减小最小宽度 */
+    text-align: right;
+}
+
+.game-board {
+    display: block;
+    background-color: #dcb35c;
+    border: 2px solid #5d4037;
+    border-radius: 5px;
+    position: relative;
+    margin: 8px auto;  /* 减少边距 */
+    width: 95vw;  /* 增加棋盘宽度比例 */
+    height: 95vw;  /* 增加棋盘高度比例 */
+    max-width: none;  /* 移除最大宽度限制，让屏幕充分利用 */
+    max-height: none;  /* 移除最大高度限制，让屏幕充分利用 */
+    aspect-ratio: 1/1;  /* 确保棋盘是正方形 */
+    overflow: hidden;
+}
+
+.board-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.intersection {
+    position: absolute;
+    cursor: pointer;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+}
+
+.stone {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 3;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transform: translate(-50%, -50%);
+}
+
+.stone.black {
+    background: radial-gradient(circle at 30% 30%, #666, #000);
+}
+
+.stone.white {
+    background: radial-gradient(circle at 30% 30%, #fff, #ccc);
+    border: 1px solid #888;
+}
+
+.controls {
+    margin: 15px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: 12px 20px;
+    margin: 5px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5d4037;
+    color: white;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+button:hover {
+    background-color: #795548;
+}
+
+.game-status {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #d32f2f;
+    min-height: 25px;
+}
+
+.last-move {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: red;
+    border-radius: 50%;
+    z-index: 4;
+    transform: translate(-50%, -50%);
+}
+
+/* 响应式设计 - 平板及小屏幕设备 */
+@media (max-width: 768px) {
+    body {
+        padding: 1px;  /* 最小化边距 */
+    }
+    
+    .container {
+        padding: 6px;  /* 减少内边距 */
+        margin: 1px;   /* 减少外边距 */
+    }
+    
+    h1 {
+        font-size: 1.2em;  /* 减小字体 */
+        margin-bottom: 6px;  /* 减少下边距 */
+    }
+    
+    .game-info {
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;  /* 减少间隔 */
+        padding: 0;  /* 消除内边距 */
+    }
+    
+    .current-player, .score {
+        text-align: center;
+        min-width: auto;
+        width: 100%;
+        font-size: 13px;  /* 减小字体 */
+    }
+    
+    .game-board {
+        width: 98vw;  /* 增加棋盘宽度比例 */
+        height: 98vw;  /* 增加棋盘高度比例 */
+        max-width: none;  /* 移除最大宽度限制 */
+        max-height: none;  /* 移除最大高度限制 */
+        margin: 5px auto;  /* 减少边距 */
+    }
+    
+    button {
+        padding: 8px 12px;  /* 减少按钮内边距 */
+        font-size: 14px;
+        min-width: 80px;  /* 减少最小宽度 */
+    }
+}
+
+/* 响应式设计 - 手机设备 */
+@media (max-width: 480px) {
+    body {
+        padding: 0;  /* 完全消除边距 */
+    }
+    
+    .container {
+        padding: 4px;  /* 最小内边距 */
+        margin: 0;    /* 消除外边距 */
+        border-radius: 4px;  /* 减少圆角 */
+    }
+    
+    h1 {
+        font-size: 1.1em;  /* 进一步减小字体 */
+        margin-bottom: 4px;  /* 减少下边距 */
+    }
+    
+    .game-info {
+        gap: 4px;  /* 进一步减少间隔 */
+        margin-bottom: 5px;  /* 减少下边距 */
+    }
+    
+    .current-player {
+        font-size: 12px;  /* 进一步减小字体 */
+    }
+    
+    .score {
+        font-size: 11px;  /* 进一步减小字体 */
+    }
+    
+    .game-board {
+        width: 99vw;  /* 最大化棋盘宽度 */
+        height: 99vw;  /* 最大化棋盘高度 */
+        max-width: none;  /* 移除最大宽度限制 */
+        max-height: none;  /* 移除最大高度限制 */
+        margin: 4px auto;  /* 减少边距 */
+        border-width: 1.5px;  /* 稍微减少边框宽度 */
+    }
+    
+    .intersection {
+        width: 15px;
+        height: 15px;
+    }
+    
+    .stone {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .last-move {
+        width: 4px;
+        height: 4px;
+    }
+    
+    .controls {
+        margin: 8px 0;  /* 减少控制区域边距 */
+        gap: 6px;  /* 减少按钮间隔 */
+    }
+    
+    button {
+        padding: 7px 10px;  /* 减少按钮内边距 */
+        font-size: 13px;    /* 减小字体 */
+        min-width: 70px;    /* 减少最小宽度 */
+        margin: 3px;        /* 减少按钮边距 */
+    }
+    
+    .game-status {
+        margin-top: 6px;   /* 减少状态区域边距 */
+        font-size: 14px;   /* 减小字体 */
+    }
+}
+
+/* 超小屏幕设备 */
+@media (max-width: 360px) {
+    .game-board {
+        width: 99.5vw;  /* 极大化棋盘宽度 */
+        height: 99.5vw;  /* 极大化棋盘高度 */
+        max-width: none;  /* 移除最大宽度限制 */
+        max-height: none;  /* 移除最大高度限制 */
+        margin: 3px auto;  /* 最小边距 */
+    }
+    
+    .intersection {
+        width: 13px;
+        height: 13px;
+    }
+    
+    .stone {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .last-move {
+        width: 3px;
+        height: 3px;
+    }
+    
+    h1 {
+        font-size: 1.0em;  /* 进一步减小标题 */
+        margin-bottom: 3px;  /* 减少下边距 */
+    }
+    
+    .current-player, .score {
+        font-size: 11px;  /* 进一步减小字体 */
+    }
+    
+    button {
+        padding: 6px 8px;  /* 进一步减少按钮内边距 */
+        font-size: 12px;   /* 进一步减小字体 */
+        min-width: 60px;   /* 进一步减少最小宽度 */
+    }
+    
+    .game-status {
+        font-size: 13px;   /* 减小字体 */
+        margin-top: 4px;   /* 减少上边距 */
+    }
+}

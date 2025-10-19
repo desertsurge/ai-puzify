@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI游戏合集</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                        accent: '#8b5cf6',
+                        dark: '#0f172a',
+                        light: '#f8fafc',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .game-card-hover {
+                @apply transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl;
+            }
+            .gradient-text {
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+            }
+            .game-icon {
+                @apply text-6xl md:text-7xl mb-4;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <!-- 顶部导航 -->
+    <nav class="bg-white shadow-md fixed w-full z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-gamepad text-primary text-2xl"></i>
+                <h1 class="text-xl md:text-2xl font-bold gradient-text">AI游戏合集</h1>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#games" class="text-gray-600 hover:text-primary transition-colors">游戏</a>
+                <a href="#about" class="text-gray-600 hover:text-primary transition-colors">关于</a>
+                <a href="#contact" class="text-gray-600 hover:text-primary transition-colors">联系我们</a>
+            </div>
+            <button class="md:hidden text-gray-600 focus:outline-none" id="menu-toggle">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="md:hidden hidden bg-white w-full" id="mobile-menu">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#games" class="text-gray-600 hover:text-primary transition-colors py-2">游戏</a>
+                <a href="#about" class="text-gray-600 hover:text-primary transition-colors py-2">关于</a>
+                <a href="#contact" class="text-gray-600 hover:text-primary transition-colors py-2">联系我们</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主横幅 -->
+    <header class="pt-28 pb-16 bg-gradient-to-r from-primary/90 to-accent/90 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4">探索AI驱动的棋盘游戏世界</h2>
+            <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8 opacity-90">精心挑选的经典棋盘游戏，融合现代AI技术，带来全新的游戏体验</p>
+            <a href="#games" class="inline-block bg-white text-primary font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                开始游戏 <i class="fa fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- 游戏部分 -->
+    <section id="games" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-12 gradient-text">精选游戏</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- 五子棋 -->
+                <a href="gomoku/index.html" class="bg-white rounded-xl overflow-hidden shadow-lg game-card-hover group">
+                    <div class="h-48 bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                        <i class="fa fa-circle-o game-icon text-white opacity-90 group-hover:scale-110 transition-transform duration-300"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">五子棋</h3>
+                        <p class="text-gray-600 mb-4">经典的东方策略游戏，率先在棋盘上连成五子即可获胜。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">策略 • 入门</span>
+                            <button class="text-primary hover:text-accent transition-colors font-medium flex items-center">
+                                开始 <i class="fa fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- 井字棋 -->
+                <a href="tic-tac-toe/tic-tac-toe.html" class="bg-white rounded-xl overflow-hidden shadow-lg game-card-hover group">
+                    <div class="h-48 bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+                        <div class="grid grid-cols-3 gap-2 w-24 h-24 text-white text-3xl font-bold">
+                            <div class="border border-white rounded-md flex items-center justify-center">X</div>
+                            <div class="border border-white rounded-md flex items-center justify-center">O</div>
+                            <div class="border border-white rounded-md flex items-center justify-center">X</div>
+                            <div class="border border-white rounded-md flex items-center justify-center">O</div>
+                            <div class="border border-white rounded-md flex items-center justify-center">X</div>
+                            <div class="border border-white rounded-md flex items-center justify-center">O</div>
+                            <div class="border border-white rounded-md flex items-center justify-center">X</div>
+                            <div class="border border-white rounded-md flex items-center justify-center">O</div>
+                            <div class="border border-white rounded-md flex items-center justify-center">X</div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">井字棋</h3>
+                        <p class="text-gray-600 mb-4">简单易懂的经典游戏，率先连成一行、一列或对角线即可获胜。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">休闲 • 入门</span>
+                            <button class="text-primary hover:text-accent transition-colors font-medium flex items-center">
+                                开始 <i class="fa fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- 围棋 -->
+                <a href="go/index.html" class="bg-white rounded-xl overflow-hidden shadow-lg game-card-hover group">
+                    <div class="h-48 bg-gradient-to-br from-amber-800 to-amber-900 flex items-center justify-center relative">
+                        <!-- 简单的围棋板图案 -->
+                        <div class="absolute w-32 h-32 border-4 border-amber-500 rounded-md" style="background-image: linear-gradient(90deg, rgba(251, 191, 36, 0.3) 1px, transparent 1px), linear-gradient(rgba(251, 191, 36, 0.3) 1px, transparent 1px); background-size: 16px 16px;"></div>
+                        <div class="absolute w-4 h-4 bg-white rounded-full -top-2 -left-2 group-hover:scale-125 transition-transform duration-300"></div>
+                        <div class="absolute w-4 h-4 bg-black rounded-full top-0 right-0 group-hover:scale-125 transition-transform duration-300"></div>
+                        <div class="absolute w-4 h-4 bg-white rounded-full -bottom-2 -right-2 group-hover:scale-125 transition-transform duration-300"></div>
+                        <div class="absolute w-4 h-4 bg-black rounded-full -bottom-2 -left-2 group-hover:scale-125 transition-transform duration-300"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">围棋</h3>
+                        <p class="text-gray-600 mb-4">古老而深奥的策略游戏，通过围地和吃子来获得胜利。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">策略 • 高级</span>
+                            <button class="text-primary hover:text-accent transition-colors font-medium flex items-center">
+                                开始 <i class="fa fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- 国际象棋 -->
+                <a href="chess/index.html" class="bg-white rounded-xl overflow-hidden shadow-lg game-card-hover group">
+                    <div class="h-48 bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center">
+                        <div class="grid grid-cols-4 gap-1 w-32 h-32">
+                            <div class="bg-white/20 flex items-center justify-center text-white text-2xl"><i class="fa fa-chess-king"></i></div>
+                            <div class="bg-white/30 flex items-center justify-center text-white text-2xl"><i class="fa fa-chess-queen"></i></div>
+                            <div class="bg-white/20 flex items-center justify-center text-white text-2xl"><i class="fa fa-chess-rook"></i></div>
+                            <div class="bg-white/30 flex items-center justify-center text-white text-2xl"><i class="fa fa-chess-bishop"></i></div>
+                            <div class="bg-white/30 flex items-center justify-center text-white text-2xl"><i class="fa fa-chess-knight"></i></div>
+                            <div class="bg-white/20 flex items-center justify-center text-white text-2xl"><i class="fa fa-chess-pawn"></i></div>
+                            <div class="bg-white/20 flex items-center justify-center text-white text-2xl"><i class="fa fa-chess-pawn"></i></div>
+                            <div class="bg-white/30 flex items-center justify-center text-white text-2xl"><i class="fa fa-chess-pawn"></i></div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">国际象棋</h3>
+                        <p class="text-gray-600 mb-4">西方经典的策略游戏，通过吃掉对方的王来获得胜利。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">策略 • 中级</span>
+                            <button class="text-primary hover:text-accent transition-colors font-medium flex items-center">
+                                开始 <i class="fa fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 特色部分 -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-12 gradient-text">游戏特色</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                        <i class="fa fa-tablet text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">全平台支持</h3>
+                    <p class="text-gray-600">无论是PC、平板还是手机，都能获得流畅的游戏体验。</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-6">
+                        <i class="fa fa-cpu text-accent text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">AI对战</h3>
+                    <p class="text-gray-600">精心设计的AI对手，提供不同难度级别，适合各级玩家。</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
+                        <i class="fa fa-trophy text-emerald-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">公平竞技</h3>
+                    <p class="text-gray-600">公平的游戏机制和规则，让你专注于策略和技巧的提升。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于部分 -->
+    <section id="about" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-12 gradient-text">关于我们</h2>
+            
+            <div class="max-w-3xl mx-auto text-center">
+                <p class="text-lg text-gray-600 mb-8">我们致力于将经典棋盘游戏与现代AI技术相结合，打造有趣、富有挑战性的游戏体验。每个游戏都经过精心设计，确保公平性和趣味性。</p>
+                <div class="flex justify-center space-x-8">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-primary mb-2" id="game-count">4</div>
+                        <p class="text-gray-600">经典游戏</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-primary mb-2" id="feature-count">3</div>
+                        <p class="text-gray-600">特色功能</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-primary mb-2" id="difficulty-count">3</div>
+                        <p class="text-gray-600">难度级别</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section id="contact" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-12 gradient-text">联系我们</h2>
+            
+            <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
+                <form id="contact-form" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-gray-700 font-medium mb-2">姓名</label>
+                        <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="请输入您的姓名">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-gray-700 font-medium mb-2">邮箱</label>
+                        <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="请输入您的邮箱">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-gray-700 font-medium mb-2">留言</label>
+                        <textarea id="message" name="message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="请输入您的留言"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 shadow-md hover:shadow-lg">
+                        发送留言
+                    </button>
+                </form>
+                <div id="form-success" class="mt-6 p-4 bg-green-100 text-green-700 rounded-lg hidden">
+                    感谢您的留言！我们会尽快回复您。
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa fa-gamepad text-primary text-2xl"></i>
+                        <h2 class="text-xl font-bold">AI游戏合集</h2>
+                    </div>
+                    <p class="text-gray-400 mt-2">© 2023 AI游戏合集. 保留所有权利。</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-github text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-twitter text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-linkedin text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
+                <p>由 <span class="text-primary">AI技术</span> 驱动，提供最佳的游戏体验</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-accent">
+        <i class="fa fa-chevron-up"></i>
+    </button>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五子棋游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .current-player {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        #player {
+            color: #ff6b6b;
+        }
+
+        #restart-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #restart-btn:hover {
+            background-color: #45a049;
+        }
+
+        .game-board {
+            display: inline-grid;
+            grid-template-columns: repeat(15, 30px);
+            grid-template-rows: repeat(15, 30px);
+            background-color: #deb887;
+            border: 2px solid #8b4513;
+            position: relative;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            border-right: 1px solid #8b4513;
+            border-bottom: 1px solid #8b4513;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Remove borders for last cells */
+        .cell:nth-child(15n) {
+            border-right: none;
+        }
+
+        .row-last .cell {
+            border-bottom: none;
+        }
+
+        /* Star points */
+        .cell[data-row="3"][data-col="3"]:before,
+        .cell[data-row="3"][data-col="11"]:before,
+        .cell[data-row="11"][data-col="3"]:before,
+        .cell[data-row="11"][data-col="11"]:before,
+        .cell[data-row="7"][data-col="7"]:before,
+        .cell[data-row="3"][data-col="7"]:before,
+        .cell[data-row="7"][data-col="3"]:before,
+        .cell[data-row="7"][data-col="11"]:before,
+        .cell[data-row="11"][data-col="7"]:before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #555;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .stone {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .black-stone {
+            background-color: black;
+        }
+
+        .white-stone {
+            background-color: white;
+        }
+
+        .win-message {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b6b;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>五子棋游戏</h1>
+        <div class="game-info">
+            <div class="current-player">当前玩家: <span id="player">黑子</span></div>
+            <button id="restart-btn">重新开始</button>
+        </div>
+        <div class="game-board" id="board"></div>
+        <div class="win-message" id="win-message"></div>
+    </div>
+
+    <script>
+        // Game state variables
+        let board = [];
+        let currentPlayer = 'black';
+        let gameOver = false;
+        const BOARD_SIZE = 15;
+
+        // DOM elements
+        const boardElement = document.getElementById('board');
+        const playerElement = document.getElementById('player');
+        const winMessageElement = document.getElementById('win-message');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Initialize the game
+        function initGame() {
+            // Create empty board
+            board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(null));
+            
+            // Clear the board element
+            boardElement.innerHTML = '';
+            
+            // Create cells using CSS Grid
+            for (let i = 0; i < BOARD_SIZE; i++) {
+                for (let j = 0; j < BOARD_SIZE; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (i === BOARD_SIZE - 1) {
+                        cell.classList.add('row-last');
+                    }
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.addEventListener('click', () => handleCellClick(i, j));
+                    boardElement.appendChild(cell);
+                }
+            }
+            
+            // Reset game state
+            currentPlayer = 'black';
+            gameOver = false;
+            playerElement.textContent = '黑子';
+            winMessageElement.textContent = '';
+        }
+
+        // Handle cell click
+        function handleCellClick(row, col) {
+            // If game is over or cell is already occupied, do nothing
+            if (gameOver || board[row][col] !== null) {
+                return;
+            }
+            
+            // Place the stone
+            board[row][col] = currentPlayer;
+            
+            // Update UI
+            // Calculate the correct index in the grid (row * BOARD_SIZE + col)
+            const index = row * BOARD_SIZE + col;
+            const cell = boardElement.children[index];
+            const stone = document.createElement('div');
+            stone.className = `stone ${currentPlayer}-stone`;
+            cell.appendChild(stone);
+            
+            // Check for win
+            if (checkWin(row, col)) {
+                gameOver = true;
+                const winner = currentPlayer === 'black' ? '黑子' : '白子';
+                winMessageElement.textContent = `${winner}获胜！`;
+                return;
+            }
+            
+            // Switch player
+            currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
+            playerElement.textContent = currentPlayer === 'black' ? '黑子' : '白子';
+        }
+
+        // Check for win condition
+        function checkWin(row, col) {
+            const player = board[row][col];
+            if (!player) return false;
+            
+            // Directions: horizontal, vertical, diagonal
+            const directions = [
+                [0, 1], [1, 0], [1, 1], [1, -1]
+            ];
+            
+            for (const [dx, dy] of directions) {
+                let count = 1;
+                
+                // Check positive direction
+                for (let i = 1; i < 5; i++) {
+                    const r = row + dx * i;
+                    const c = col + dy * i;
+                    if (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                // Check negative direction
+                for (let i = 1; i < 5; i++) {
+                    const r = row - dx * i;
+                    const c = col - dy * i;
+                    if (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === player) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                if (count >= 5) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        // Restart game
+        restartBtn.addEventListener('click', initGame);
+
+        // Initialize the game when page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>

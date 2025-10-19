@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国际象棋</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>国际象棋</h1>
+            <div class="game-info">
+                <div class="player-info">
+                    <span>当前玩家: </span>
+                    <span id="current-player">白方</span>
+                    <span id="check-indicator" class="check-indicator"></span>
+                </div>
+                <div class="game-status">
+                    <span id="game-status">游戏进行中</span>
+                </div>
+                <div class="mobile-controls">
+                    <button id="new-game">新游戏</button>
+                    <button id="clear-selection" class="mobile-only">取消选择</button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="chess-container">
+            <div class="mobile-controls-top mobile-only">
+                <div class="mobile-rules-toggle">
+                    <button id="toggle-rules-mobile">显示规则</button>
+                </div>
+            </div>
+            
+            <div class="chessboard-wrapper">
+                <div class="chessboard">
+                    <!-- 棋盘将由JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <div class="rules-section">
+                    <h3>游戏规则</h3>
+                    <div class="rules-content">
+                        <h4>🎯 棋子移动规则</h4>
+                        <div class="rule-item">
+                            <span class="piece-icon">♙</span>
+                            <strong>兵 (Pawn)</strong>: 直走斜吃，起始位置可走两格
+                        </div>
+                        <div class="rule-item">
+                            <span class="piece-icon">♘</span>
+                            <strong>马 (Knight)</strong>: L形移动（先横/竖走两格，再竖/横走一格）
+                        </div>
+                        <div class="rule-item">
+                            <span class="piece-icon">♗</span>
+                            <strong>象 (Bishop)</strong>: 斜线移动，不限格数
+                        </div>
+                        <div class="rule-item">
+                            <span class="piece-icon">♖</span>
+                            <strong>车 (Rook)</strong>: 直线移动，不限格数
+                        </div>
+                        <div class="rule-item">
+                            <span class="piece-icon">♕</span>
+                            <strong>后 (Queen)</strong>: 直线和斜线移动，不限格数
+                        </div>
+                        <div class="rule-item">
+                            <span class="piece-icon">♔</span>
+                            <strong>王 (King)</strong>: 周围一格移动
+                        </div>
+                        
+                        <h4>🎮 游戏玩法</h4>
+                        <ol class="gameplay-steps">
+                            <li>点击棋子选中（高亮显示）</li>
+                            <li>绿色格子表示可移动位置</li>
+                            <li>粉色格子表示可吃子位置</li>
+                            <li>点击目标位置完成移动</li>
+                            <li>轮流走棋，直到一方获胜</li>
+                        </ol>
+                        
+                        <h4>🏆 胜利条件</h4>
+                        <p>将死对方的王即为胜利！</p>
+                    </div>
+                </div>
+                
+                <div class="captured-pieces">
+                    <h3>被吃掉的棋子</h3>
+                    <div class="white-captured" id="white-captured"></div>
+                    <div class="black-captured" id="black-captured"></div>
+                </div>
+                
+                <div class="move-history">
+                    <h3>走棋记录</h3>
+                    <div id="move-history"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="chess.js"></script>
+</body>
+</html>

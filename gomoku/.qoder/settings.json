@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "ask": [
+      "Read(!D:\\git\\AI\\case\\game\\五子棋/**)",
+      "Edit(!D:\\git\\AI\\case\\game\\五子棋/**)"
+    ],
+    "allow": [
+      "Read(D:\\git\\AI\\case\\game\\五子棋/**)",
+      "Edit(D:\\git\\AI\\case\\game\\五子棋/**)"
+    ]
+  },
+  "memoryImport": {},
+  "monitoring": {}
+}
