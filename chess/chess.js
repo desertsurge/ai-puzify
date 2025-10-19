@@ -16,6 +16,9 @@ class ChessGame {
             black: { left: false, right: false }
         };
         
+        // 吃过路兵相关状态
+        this.lastMove = null; // 记录上一步移动，用于判断吃过路兵
+        
         this.pieceSymbols = {
             white: {
                 king: '♔',
@@ -330,12 +333,29 @@ class ChessGame {
             }
         }
         
-        // 吃子
+        // 吃子（斜向）
         [-1, 1].forEach(dc => {
-            if (this.isInBounds(row + direction, col + dc) && 
-                this.board[row + direction][col + dc] &&
-                this.board[row + direction][col + dc].color !== piece.color) {
-                moves.push({ row: row + direction, col: col + dc });
+            const targetRow = row + direction;
+            const targetCol = col + dc;
+            
+            if (this.isInBounds(targetRow, targetCol)) {
+                const targetPiece = this.board[targetRow][targetCol];
+                
+                // 普通吃子
+                if (targetPiece && targetPiece.color !== piece.color) {
+                    moves.push({ row: targetRow, col: targetCol });
+                }
+                
+                // 吃过路兵
+                if (!targetPiece && this.lastMove && 
+                    this.lastMove.piece.type === 'pawn' &&
+                    this.lastMove.isTwoSquarePawnMove &&
+                    this.lastMove.to.row === row && // 对方兵与当前兵在同一行
+                    this.lastMove.to.col === targetCol) { // 对方兵在相邻列
+                    
+                    // 检查是否是刚刚移动的兵（必须是上一步移动的）
+                    moves.push({ row: targetRow, col: targetCol, enPassant: true });
+                }
             }
         });
     }
@@ -514,8 +534,23 @@ class ChessGame {
             castlingType = toCol > fromCol ? 'kingside' : 'queenside';
         }
         
-        // 记录被吃掉的棋子
-        if (capturedPiece) {
+        // 处理吃过路兵
+        let isEnPassant = false;
+        let enPassantCapturedRow = null;
+        let enPassantCapturedCol = null;
+        
+        if (piece.type === 'pawn' && !capturedPiece && fromCol !== toCol) {
+            // 兵斜向移动但目标位置没有棋子，说明是吃过路兵
+            isEnPassant = true;
+            enPassantCapturedRow = fromRow; // 被吃掉的兵在起始行
+            enPassantCapturedCol = toCol; // 被吃掉的兵在目标列
+            const enPassantCapturedPiece = this.board[enPassantCapturedRow][enPassantCapturedCol];
+            this.capturedPieces[this.currentPlayer].push(enPassantCapturedPiece);
+            this.board[enPassantCapturedRow][enPassantCapturedCol] = null; // 移除被吃掉的兵
+        }
+        
+        // 记录被吃掉的棋子（普通吃子）
+        if (capturedPiece && !isEnPassant) {
             this.capturedPieces[this.currentPlayer].push(capturedPiece);
         }
         
@@ -561,8 +596,16 @@ class ChessGame {
             }, 100);
         }
         
+        // 记录上一步移动（用于判断吃过路兵）
+        this.lastMove = {
+            piece: piece,
+            from: { row: fromRow, col: fromCol },
+            to: { row: toRow, col: toCol },
+            isTwoSquarePawnMove: (piece.type === 'pawn' && Math.abs(toRow - fromRow) === 2)
+        };
+        
         // 记录走棋历史
-        const moveNotation = this.getMoveNotation(fromRow, fromCol, toRow, toCol, capturedPiece, isCastling, castlingType);
+        const moveNotation = this.getMoveNotation(fromRow, fromCol, toRow, toCol, capturedPiece, isCastling, castlingType, isEnPassant);
         this.moveHistory.push({
             player: this.currentPlayer,
             from: { row: fromRow, col: fromCol },
@@ -584,7 +627,7 @@ class ChessGame {
         this.updateMoveHistory();
     }
     
-    getMoveNotation(fromRow, fromCol, toRow, toCol, capturedPiece, isCastling, castlingType) {
+    getMoveNotation(fromRow, fromCol, toRow, toCol, capturedPiece, isCastling, castlingType, isEnPassant) {
         // 王车易位有特殊记谱
         if (isCastling) {
             return castlingType === 'kingside' ? 'O-O' : 'O-O-O';
@@ -601,10 +644,21 @@ class ChessGame {
         
         if (piece.type !== 'pawn') {
             notation += piece.type === 'knight' ? 'N' : piece.type[0].toUpperCase();
+        } else if (capturedPiece || isEnPassant) {
+            // 兵吃子时需要标明起始列
+            notation += fromFile;
         }
         
-        notation += capturedPiece ? 'x' : '';
+        if (capturedPiece || isEnPassant) {
+            notation += 'x';
+        }
+        
         notation += `${toFile}${toRank}`;
+        
+        // 吃过路兵有特殊标记
+        if (isEnPassant) {
+            notation += ' e.p.';
+        }
         
         // 检查是否将军
         const opponentColor = piece.color === 'white' ? 'black' : 'white';
@@ -851,6 +905,9 @@ class ChessGame {
             white: { left: false, right: false },
             black: { left: false, right: false }
         };
+        
+        // 重置吃过路兵状态
+        this.lastMove = null;
         
         this.createBoard();
         this.renderBoard();
