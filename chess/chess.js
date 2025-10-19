@@ -388,6 +388,14 @@ class ChessGame {
         this.board[toRow][toCol] = piece;
         this.board[fromRow][fromCol] = null;
         
+        // 检查兵是否到达底线需要晋升
+        if (piece.type === 'pawn' && (toRow === 0 || toRow === 7)) {
+            // 延迟晋升选择，先完成移动记录
+            setTimeout(() => {
+                this.promotePawn(toRow, toCol);
+            }, 100);
+        }
+        
         // 记录走棋历史
         const moveNotation = this.getMoveNotation(fromRow, fromCol, toRow, toCol, capturedPiece);
         this.moveHistory.push({
@@ -696,6 +704,184 @@ class ChessGame {
                 toggleButton.textContent = rulesContent.style.display === 'none' ? '显示规则' : '隐藏规则';
             }
         }
+    }
+    
+    promotePawn(row, col) {
+        const piece = this.board[row][col];
+        if (!piece || piece.type !== 'pawn') return;
+        
+        // 创建晋升选择界面
+        const promotionModal = document.createElement('div');
+        promotionModal.className = 'promotion-modal';
+        promotionModal.innerHTML = `
+            <div class="promotion-overlay"></div>
+            <div class="promotion-dialog">
+                <h3>选择晋升棋子</h3>
+                <p>请选择要将兵晋升为哪种棋子：</p>
+                <div class="promotion-options">
+                    <button class="promotion-option" data-type="queen">
+                        <span class="piece-icon">${this.pieceSymbols[piece.color].queen}</span>
+                        <span>后 (Queen)</span>
+                    </button>
+                    <button class="promotion-option" data-type="rook">
+                        <span class="piece-icon">${this.pieceSymbols[piece.color].rook}</span>
+                        <span>车 (Rook)</span>
+                    </button>
+                    <button class="promotion-option" data-type="bishop">
+                        <span class="piece-icon">${this.pieceSymbols[piece.color].bishop}</span>
+                        <span>象 (Bishop)</span>
+                    </button>
+                    <button class="promotion-option" data-type="knight">
+                        <span class="piece-icon">${this.pieceSymbols[piece.color].knight}</span>
+                        <span>马 (Knight)</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(promotionModal);
+        
+        // 添加样式
+        if (!document.querySelector('#promotion-styles')) {
+            const style = document.createElement('style');
+            style.id = 'promotion-styles';
+            style.textContent = `
+                .promotion-modal {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                
+                .promotion-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.7);
+                    backdrop-filter: blur(5px);
+                }
+                
+                .promotion-dialog {
+                    position: relative;
+                    background: white;
+                    border-radius: 15px;
+                    padding: 25px;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                    z-index: 1001;
+                }
+                
+                .promotion-dialog h3 {
+                    color: #2c3e50;
+                    margin-bottom: 10px;
+                    text-align: center;
+                }
+                
+                .promotion-dialog p {
+                    color: #666;
+                    margin-bottom: 20px;
+                    text-align: center;
+                }
+                
+                .promotion-options {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                }
+                
+                .promotion-option {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding: 15px;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 10px;
+                    background: #f8f9fa;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    font-size: 14px;
+                }
+                
+                .promotion-option:hover {
+                    border-color: #3498db;
+                    background: #e3f2fd;
+                    transform: translateY(-2px);
+                }
+                
+                .promotion-option .piece-icon {
+                    font-size: 2.5rem;
+                    margin-bottom: 8px;
+                    font-weight: bold;
+                }
+                
+                @media (max-width: 480px) {
+                    .promotion-options {
+                        grid-template-columns: 1fr;
+                    }
+                    
+                    .promotion-option {
+                        flex-direction: row;
+                        justify-content: flex-start;
+                        gap: 15px;
+                    }
+                    
+                    .promotion-option .piece-icon {
+                        font-size: 2rem;
+                        margin-bottom: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 处理选择事件
+        const options = promotionModal.querySelectorAll('.promotion-option');
+        options.forEach(option => {
+            option.addEventListener('click', (e) => {
+                const promoteTo = e.currentTarget.dataset.type;
+                this.executePromotion(row, col, promoteTo);
+                document.body.removeChild(promotionModal);
+            });
+        });
+        
+        // 点击遮罩层关闭
+        promotionModal.querySelector('.promotion-overlay').addEventListener('click', () => {
+            // 默认晋升为后
+            this.executePromotion(row, col, 'queen');
+            document.body.removeChild(promotionModal);
+        });
+    }
+    
+    executePromotion(row, col, promoteTo) {
+        const piece = this.board[row][col];
+        if (!piece || piece.type !== 'pawn') return;
+        
+        // 更新棋子类型
+        piece.type = promoteTo;
+        
+        // 更新走棋记录中的晋升标记
+        if (this.moveHistory.length > 0) {
+            const lastMove = this.moveHistory[this.moveHistory.length - 1];
+            if (lastMove.notation && lastMove.to.row === row && lastMove.to.col === col) {
+                // 在国际象棋记谱中，晋升用=表示，例如e8=Q
+                lastMove.notation += '=' + (promoteTo === 'knight' ? 'N' : promoteTo[0].toUpperCase());
+            }
+        }
+        
+        // 重新渲染棋盘
+        this.renderBoard();
+        this.updateMoveHistory();
+        
+        // 检查游戏状态
+        this.checkGameStatus();
     }
 }
 
