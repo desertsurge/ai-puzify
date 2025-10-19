@@ -34,6 +34,16 @@ class App {
             if (this.currentPage === 'stats' && window.statsManager) {
                 window.statsManager.updateStatsDisplay();
             }
+            // 当窗口大小改变时，重新调整方块下落游戏的画布
+            if (window.fallingGame && window.fallingGame.canvas) {
+                window.fallingGame.resizeCanvas();
+                // 如果游戏正在进行中，强制重绘
+                if (window.fallingGame.gameActive && window.fallingGame.ctx) {
+                    window.fallingGame.ctx.fillStyle = 'white';
+                    window.fallingGame.ctx.fillRect(0, 0, window.fallingGame.canvas.width, window.fallingGame.canvas.height);
+                    window.fallingGame.drawGrid();
+                }
+            }
         });
 
         // 页面可见性改变时暂停/恢复游戏

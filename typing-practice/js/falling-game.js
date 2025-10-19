@@ -59,6 +59,12 @@ class FallingGame {
         this.canvas.width = Math.min(800, container.clientWidth);
         this.canvas.height = Math.min(600, window.innerHeight * 0.6);
         console.log('画布尺寸调整:', this.canvas.width, this.canvas.height);
+        
+        // 强制重绘画布背景
+        if (this.ctx) {
+            this.ctx.fillStyle = 'white';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
     }
 
     changeDifficulty(level) {
@@ -94,9 +100,31 @@ class FallingGame {
         this.elements.input.disabled = false;
         this.elements.input.focus();
         
+        // 立即调整画布尺寸
+        this.resizeCanvas();
+        
+        // 确保画布可见
+        this.canvas.style.display = 'block';
+        this.canvas.style.visibility = 'visible';
+        
+        // 强制重绘画布背景
+        if (this.ctx) {
+            this.ctx.fillStyle = 'white';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        
         // 立即生成几个方块用于测试
         for (let i = 0; i < 3; i++) {
-            this.spawnBlock();
+            setTimeout(() => {
+                this.spawnBlock();
+                // 强制重绘以确保方块可见
+                if (this.ctx) {
+                    this.ctx.fillStyle = 'white';
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.drawGrid();
+                    this.draw();
+                }
+            }, i * 500);
         }
         
         console.log('游戏开始，方块数量:', this.blocks.length);
