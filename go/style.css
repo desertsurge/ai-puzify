@@ -68,21 +68,31 @@ h1 {
     border: 2px solid #5d4037;
     border-radius: 5px;
     position: relative;
-    margin: 4px auto;  /* 进一步减少边距 */
-    width: 90vw;  /* 减少棋盘宽度比例，留出更多空白 */
-    height: 90vw;  /* 减少棋盘高度比例 */
-    max-width: calc(100vh - 200px);  /* 考虑标题和按钮的高度 */
-    max-height: calc(100vh - 200px);  /* 确保棋盘不会超出屏幕高度 */
-    aspect-ratio: 1/1;  /* 确保棋盘是正方形 */
-    overflow: hidden;
+    margin: 4px auto;
+    width: 90vw;
+    height: 90vw;
+    max-width: 680px;
+    max-height: 680px;
+    aspect-ratio: 1/1;
+    overflow: visible; /* 允许内容溢出 */
+}
+
+.board-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* 隐藏超出容器的内容 */
+    padding: 20px; /* 为边缘棋子留出空间 */
+    box-sizing: border-box;
 }
 
 .board-grid {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    /* 移除原来的width和height，使用top/right/bottom/left定位 */
 }
 
 .intersection {
@@ -90,10 +100,10 @@ h1 {
     cursor: pointer;
     z-index: 2;
     transform: translate(-50%, -50%);
-    width: 30px;  /* 设置点击区域大小 */
-    height: 30px;  /* 设置点击区域大小 */
-    background-color: transparent;  /* 透明背景 */
-    border-radius: 50%;  /* 圆形点击区域 */
+    width: 30px;
+    height: 30px;
+    background-color: transparent;
+    border-radius: 50%;
 }
 
 .stone {
@@ -102,8 +112,8 @@ h1 {
     z-index: 3;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     transform: translate(-50%, -50%);
-    width: 28px;  /* 棋子大小 */
-    height: 28px;  /* 棋子大小 */
+    width: 28px;
+    height: 28px;
 }
 
 .stone.black {
@@ -148,13 +158,69 @@ button:hover {
 }
 
 /* 规则说明样式 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    max-width: 720px;
+    width: 100%;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+}
+
+.nav-bar {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.arrow-left {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    transform: rotate(-45deg);
+    margin-right: 8px;
+}
+
 .header-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 15px;
 }
 
 .rules-toggle {
@@ -279,28 +345,28 @@ button:hover {
 /* 响应式设计 - 大屏幕PC设备 */
 @media (min-width: 1200px) {
     .game-board {
-        width: 85vw;  /* 在大屏幕上使用更小的比例 */
-        height: 85vw;  /* 在大屏幕上使用更小的比例 */
-        max-width: calc(100vh - 150px);  /* 更宽松的高度限制 */
-        max-height: calc(100vh - 150px);  /* 更宽松的高度限制 */
-        margin: 8px auto;  /* 增加边距让棋盘更有呼吸感 */
+        width: 85vw;
+        height: 85vw;
+        max-width: 680px;
+        max-height: 680px;
+        margin: 8px auto;
     }
     
     h1 {
-        font-size: 1.5em;  /* 增大标题字体 */
-        margin-bottom: 12px;  /* 增加下边距 */
+        font-size: 1.5em;
+        margin-bottom: 12px;
     }
     
     .game-info {
-        font-size: 16px;  /* 增大信息字体 */
+        font-size: 16px;
     }
     
     .container {
-        padding: 12px;  /* 增加容器内边距 */
+        padding: 12px;
     }
     
     .rules-grid {
-        grid-template-columns: repeat(3, 1fr);  /* 在大屏幕上显示3列 */
+        grid-template-columns: repeat(3, 1fr);
         gap: 20px;
     }
     

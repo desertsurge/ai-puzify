@@ -291,47 +291,53 @@ document.addEventListener('DOMContentLoaded', () => {
         boardElement.style.width = `${boardSize}px`;
         boardElement.style.height = `${boardSize}px`;
 
+        // Create board container
+        const boardContainer = document.createElement('div');
+        boardContainer.className = 'board-container';
+        boardElement.appendChild(boardContainer);
+        
         // Create grid lines
         const boardGrid = document.createElement('div');
         boardGrid.className = 'board-grid';
-        
+        boardContainer.appendChild(boardGrid);
+
+        // Create grid lines using percentage-based positioning
         for (let i = 0; i < game.size; i++) {
-            // Calculate position based on cell size
-            const pos = (i * cellSize);
+            const pos = (i / (game.size - 1)) * 100; // Percentage position
             
             // Horizontal lines
             const hLine = document.createElement('div');
             hLine.style.position = 'absolute';
             hLine.style.left = '0';
-            hLine.style.top = `${pos}px`;
+            hLine.style.top = `${pos}%`;
             hLine.style.width = '100%';
             hLine.style.height = '1px';
             hLine.style.backgroundColor = '#5d4037';
+            hLine.style.transform = 'translateY(-50%)'; // 精确对齐到交叉点
             boardGrid.appendChild(hLine);
             
             // Vertical lines
             const vLine = document.createElement('div');
             vLine.style.position = 'absolute';
-            vLine.style.left = `${pos}px`;
+            vLine.style.left = `${pos}%`;
             vLine.style.top = '0';
             vLine.style.width = '1px';
             vLine.style.height = '100%';
             vLine.style.backgroundColor = '#5d4037';
+            vLine.style.transform = 'translateX(-50%)'; // 精确对齐到交叉点
             boardGrid.appendChild(vLine);
         }
-        
-        boardElement.appendChild(boardGrid);
 
-        // Create intersections where stones can be placed
+        // Create intersections where stones can be placed using percentage-based positioning
         for (let row = 0; row < game.size; row++) {
             for (let col = 0; col < game.size; col++) {
-                const posX = (col * cellSize);  // X coordinate based on column
-                const posY = (row * cellSize);  // Y coordinate based on row
+                const posX = (col / (game.size - 1)) * 100; // Percentage X coordinate
+                const posY = (row / (game.size - 1)) * 100; // Percentage Y coordinate
                 
                 const intersection = document.createElement('div');
                 intersection.className = 'intersection';
-                intersection.style.left = `${posX}px`;
-                intersection.style.top = `${posY}px`;
+                intersection.style.left = `${posX}%`;
+                intersection.style.top = `${posY}%`;
                 intersection.dataset.row = row;
                 intersection.dataset.col = col;
                 
@@ -353,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 
-                boardElement.appendChild(intersection);
+                boardContainer.appendChild(intersection);
             }
         }
         
@@ -371,31 +377,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const existingLastMove = boardElement.querySelectorAll('.last-move');
         existingLastMove.forEach(marker => marker.remove());
 
-        // Calculate the board size and cell size for positioning
-        const boardRect = boardElement.getBoundingClientRect();
-        const boardSize = boardRect.width; // Use actual rendered width
-        const cellSize = boardSize / (game.size - 1);
-        
-        // Add stones based on current board state
+        // Add stones based on current board state using percentage positioning
         for (let row = 0; row < game.size; row++) {
             for (let col = 0; col < game.size; col++) {
                 if (game.board[row][col] !== 0) {
-                    const posX = col * cellSize;  // X coordinate based on column
-                    const posY = row * cellSize;  // Y coordinate based on row
+                    const posX = (col / (game.size - 1)) * 100; // Percentage X coordinate
+                    const posY = (row / (game.size - 1)) * 100; // Percentage Y coordinate
                     
                     const stone = document.createElement('div');
                     stone.className = `stone ${game.board[row][col] === 1 ? 'black' : 'white'}`;
-                    stone.style.left = `${posX}px`;
-                    stone.style.top = `${posY}px`;
-                    boardElement.appendChild(stone);
+                    stone.style.left = `${posX}%`;
+                    stone.style.top = `${posY}%`;
+                    stone.style.position = 'absolute';
+                    stone.style.transform = 'translate(-50%, -50%)'; // 精确居中
+                    boardElement.querySelector('.board-container').appendChild(stone);
                     
                     // Highlight the last move
                     if (game.lastMove && game.lastMove.row === row && game.lastMove.col === col) {
                         const lastMoveMarker = document.createElement('div');
                         lastMoveMarker.className = 'last-move';
-                        lastMoveMarker.style.left = `${posX}px`;
-                        lastMoveMarker.style.top = `${posY}px`;
-                        boardElement.appendChild(lastMoveMarker);
+                        lastMoveMarker.style.left = `${posX}%`;
+                        lastMoveMarker.style.top = `${posY}%`;
+                        lastMoveMarker.style.position = 'absolute';
+                        lastMoveMarker.style.transform = 'translate(-50%, -50%)'; // 精确居中
+                        boardElement.querySelector('.board-container').appendChild(lastMoveMarker);
                     }
                 }
             }

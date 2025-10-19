@@ -55,6 +55,42 @@
             border-radius: 2px;
         }
 
+        .nav-bar {
+            width: 100%;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        .arrow-left {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid white;
+            border-left: 2px solid white;
+            transform: rotate(-45deg);
+            margin-right: 8px;
+        }
+
         .rules {
             background-color: #f8f9fa;
             border-radius: 8px;
@@ -382,6 +418,11 @@
 </head>
 <body>
     <div class="container">
+        <div class="nav-bar">
+            <a href="../index.html" class="back-button">
+                <i class="arrow-left"></i> 返回主界面
+            </a>
+        </div>
         <h1>五子棋游戏</h1>
         <div class="rules">
             <h2>玩法规则</h2>
