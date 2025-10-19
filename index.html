@@ -84,7 +84,91 @@
         <div class="container mx-auto px-4">
             <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-12 gradient-text">精选游戏</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 中国象棋 -->
+                <a href="xiangqi/index.html" class="bg-white rounded-xl overflow-hidden shadow-lg game-card-hover group">
+                    <div class="h-48 bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center">
+                        <div class="text-white text-6xl font-bold" style="font-family: 'STXingkai', '华文行楷', 'KaiTi', '楷体', serif;">將</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">中国象棋</h3>
+                        <p class="text-gray-600 mb-4">中国传统棋类游戏，通过吃掉对方的将/帅来获得胜利。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">策略 • 中级</span>
+                            <button class="text-primary hover:text-accent transition-colors font-medium flex items-center">
+                                开始 <i class="fa fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- 迷宫 -->
+                <a href="maze/index.html" class="bg-white rounded-xl overflow-hidden shadow-lg game-card-hover group">
+                    <div class="h-48 bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center">
+                        <div class="relative">
+                            <div class="grid grid-cols-5 gap-1 w-32 h-32">
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/80"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/80"></div>
+                                <div class="bg-white/80"></div>
+                                <div class="bg-white/80"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/80"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/80"></div>
+                                <div class="bg-white/20"></div>
+                                <div class="bg-white/20"></div>
+                            </div>
+                            <div class="absolute top-1 left-1 w-3 h-3 bg-green-400 rounded-full"></div>
+                            <div class="absolute bottom-1 right-1 w-3 h-3 bg-red-400 rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">迷宫</h3>
+                        <p class="text-gray-600 mb-4">寻找从起点到终点的路径，挑战你的空间感知能力。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">益智 • 入门</span>
+                            <button class="text-primary hover:text-accent transition-colors font-medium flex items-center">
+                                开始 <i class="fa fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- 打字游戏 -->
+                <a href="typing-practice/index.html" class="bg-white rounded-xl overflow-hidden shadow-lg game-card-hover group">
+                    <div class="h-48 bg-gradient-to-br from-indigo-600 to-indigo-800 flex items-center justify-center">
+                        <div class="text-white text-center">
+                            <div class="text-4xl font-mono mb-2">A-Z</div>
+                            <div class="text-sm">速度 & 准确性</div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">打字游戏</h3>
+                        <p class="text-gray-600 mb-4">提高打字速度和准确性，挑战你的键盘技能。</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">技能 • 入门</span>
+                            <button class="text-primary hover:text-accent transition-colors font-medium flex items-center">
+                                开始 <i class="fa fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+                
                 <!-- 五子棋 -->
                 <a href="gomoku/index.html" class="bg-white rounded-xl overflow-hidden shadow-lg game-card-hover group">
                     <div class="h-48 bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
@@ -150,7 +234,7 @@
                         </div>
                     </div>
                 </a>
-                
+                                
                 <!-- 国际象棋 -->
                 <a href="chess/index.html" class="bg-white rounded-xl overflow-hidden shadow-lg game-card-hover group">
                     <div class="h-48 bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center">
@@ -222,7 +306,7 @@
                 <p class="text-lg text-gray-600 mb-8">我们致力于将经典棋盘游戏与现代AI技术相结合，打造有趣、富有挑战性的游戏体验。每个游戏都经过精心设计，确保公平性和趣味性。</p>
                 <div class="flex justify-center space-x-8">
                     <div class="text-center">
-                        <div class="text-4xl font-bold text-primary mb-2" id="game-count">4</div>
+                        <div class="text-4xl font-bold text-primary mb-2" id="game-count">7</div>
                         <p class="text-gray-600">经典游戏</p>
                     </div>
                     <div class="text-center">
@@ -278,6 +362,7 @@
                         <h2 class="text-xl font-bold">AI游戏合集</h2>
                     </div>
                     <p class="text-gray-400 mt-2">© 2023 AI游戏合集. 保留所有权利。</p>
+                    <p class="text-gray-400 mt-2">作者：西安市第一学校八年级（10）班 刘羿辰</p>
                 </div>
                 <div class="flex space-x-6">
                     <a href="#" class="text-gray-400 hover:text-white transition-colors">
