@@ -359,7 +359,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 
-                boardContainer.appendChild(intersection);
+                // 将交叉点添加到board-grid而不是board-container
+                boardGrid.appendChild(intersection);
             }
         }
         
@@ -390,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     stone.style.top = `${posY}%`;
                     stone.style.position = 'absolute';
                     stone.style.transform = 'translate(-50%, -50%)'; // 精确居中
-                    boardElement.querySelector('.board-container').appendChild(stone);
+                    boardElement.querySelector('.board-grid').appendChild(stone);
                     
                     // Highlight the last move
                     if (game.lastMove && game.lastMove.row === row && game.lastMove.col === col) {
@@ -400,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         lastMoveMarker.style.top = `${posY}%`;
                         lastMoveMarker.style.position = 'absolute';
                         lastMoveMarker.style.transform = 'translate(-50%, -50%)'; // 精确居中
-                        boardElement.querySelector('.board-container').appendChild(lastMoveMarker);
+                        boardElement.querySelector('.board-grid').appendChild(lastMoveMarker);
                     }
                 }
             }

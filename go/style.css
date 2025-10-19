@@ -95,6 +95,13 @@ h1 {
     /* 移除原来的width和height，使用top/right/bottom/left定位 */
 }
 
+/* 确保交叉点和棋子相对于board-grid定位 */
+.board-grid .intersection,
+.board-grid .stone,
+.board-grid .last-move {
+    position: absolute;
+}
+
 .intersection {
     position: absolute;
     cursor: pointer;
