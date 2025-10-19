@@ -147,6 +147,125 @@ button:hover {
     min-height: 25px;
 }
 
+/* 规则说明样式 */
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.rules-toggle {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: 1px solid #5d4037;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    color: #5d4037;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.rules-toggle:hover {
+    background-color: #5d4037;
+    color: white;
+}
+
+.rules-section {
+    display: none;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px solid #5d4037;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 0;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.rules-section.active {
+    display: block;
+}
+
+.rules-content {
+    padding: 20px;
+}
+
+.rules-content h3 {
+    color: #5d4037;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.3em;
+    border-bottom: 2px solid #5d4037;
+    padding-bottom: 8px;
+}
+
+.rules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.rule-item {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #5d4037;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.rule-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.rule-item h4 {
+    color: #5d4037;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rule-item p {
+    color: #666;
+    line-height: 1.4;
+    margin: 0;
+    font-size: 0.9em;
+}
+
+.rules-footer {
+    text-align: center;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.rules-footer p {
+    margin-bottom: 15px;
+    color: #5d4037;
+    font-weight: bold;
+}
+
+.close-rules {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: 1px solid #5d4037;
+    border-radius: 4px;
+    background-color: #5d4037;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-rules:hover {
+    background-color: #795548;
+    border-color: #795548;
+}
+
 .last-move {
     position: absolute;
     width: 8px;
@@ -179,6 +298,20 @@ button:hover {
     .container {
         padding: 12px;  /* 增加容器内边距 */
     }
+    
+    .rules-grid {
+        grid-template-columns: repeat(3, 1fr);  /* 在大屏幕上显示3列 */
+        gap: 20px;
+    }
+    
+    .rule-item {
+        padding: 20px;
+    }
+    
+    .rules-toggle {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
 }
 
 /* 响应式设计 - 平板及小屏幕设备 */
@@ -195,6 +328,12 @@ button:hover {
     h1 {
         font-size: 1.2em;  /* 减小字体 */
         margin-bottom: 6px;  /* 减少下边距 */
+    }
+    
+    .header-section {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
     }
     
     .game-info {
@@ -223,6 +362,31 @@ button:hover {
         padding: 8px 12px;  /* 减少按钮内边距 */
         font-size: 14px;
         min-width: 80px;  /* 减少最小宽度 */
+    }
+    
+    .rules-grid {
+        grid-template-columns: 1fr;  /* 平板设备单列显示 */
+        gap: 12px;
+    }
+    
+    .rules-content {
+        padding: 15px;
+    }
+    
+    .rules-content h3 {
+        font-size: 1.2em;
+    }
+    
+    .rule-item {
+        padding: 12px;
+    }
+    
+    .rule-item h4 {
+        font-size: 1.0em;
+    }
+    
+    .rule-item p {
+        font-size: 0.85em;
     }
 }
 

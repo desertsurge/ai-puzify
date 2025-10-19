@@ -8,7 +8,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>围棋游戏 (Weiqi)</h1>
+        <div class="header-section">
+            <h1>围棋游戏 (Weiqi)</h1>
+            <button id="rules-toggle" class="rules-toggle">规则说明</button>
+        </div>
+        
         <div class="game-info">
             <div class="current-player">当前玩家: <span id="current-player">黑棋</span></div>
             <div class="score">
@@ -16,6 +20,43 @@
                 <div>白棋: <span id="white-score">0</span> (吃子: <span id="white-captures">0</span>)</div>
             </div>
         </div>
+        
+        <div class="rules-section" id="rules-section">
+            <div class="rules-content">
+                <h3>围棋基本规则</h3>
+                <div class="rules-grid">
+                    <div class="rule-item">
+                        <h4>🎯 游戏目标</h4>
+                        <p>通过围地来获得更多领地，同时可以吃掉对方的棋子</p>
+                    </div>
+                    <div class="rule-item">
+                        <h4>⚫ 棋子放置</h4>
+                        <p>黑棋先行，轮流在交叉点上放置棋子，不能放在已经有棋子的位置</p>
+                    </div>
+                    <div class="rule-item">
+                        <h4>🔗 气与吃子</h4>
+                        <p>棋子相邻的空交叉点称为"气"，当棋子被完全包围（无气）时会被吃掉</p>
+                    </div>
+                    <div class="rule-item">
+                        <h4>🚫 禁止自杀</h4>
+                        <p>不能下在会导致自己棋子立即被吃的位置（自杀规则）</p>
+                    </div>
+                    <div class="rule-item">
+                        <h4>🔄 打劫规则</h4>
+                        <p>不能立即重复上一个棋盘局面（劫争规则）</p>
+                    </div>
+                    <div class="rule-item">
+                        <h4>🏁 游戏结束</h4>
+                        <p>双方连续虚手（放弃落子）后游戏结束，计算领地决定胜负</p>
+                    </div>
+                </div>
+                <div class="rules-footer">
+                    <p><strong>计分方式：</strong> 领地数 + 吃子数 = 总分数</p>
+                    <button id="close-rules" class="close-rules">关闭规则</button>
+                </div>
+            </div>
+        </div>
+        
         <div class="game-board" id="game-board"></div>
         <div class="controls">
             <button id="pass-btn">虚手</button>

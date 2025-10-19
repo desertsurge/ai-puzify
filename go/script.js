@@ -430,6 +430,23 @@ document.addEventListener('DOMContentLoaded', () => {
         createBoard(); // Reinitialize the board to reset the layout as well
     });
 
+    // Rules toggle functionality
+    const rulesToggle = document.getElementById('rules-toggle');
+    const rulesSection = document.getElementById('rules-section');
+    const closeRules = document.getElementById('close-rules');
+
+    if (rulesToggle && rulesSection) {
+        rulesToggle.addEventListener('click', () => {
+            rulesSection.style.display = rulesSection.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+
+    if (closeRules && rulesSection) {
+        closeRules.addEventListener('click', () => {
+            rulesSection.style.display = 'none';
+        });
+    }
+
     // Handle window resize to adjust board size
     window.addEventListener('resize', () => {
         createBoard();
