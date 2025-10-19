@@ -9,6 +9,13 @@ class ChessGame {
         this.gameOver = false;
         this.inCheck = { white: false, black: false };
         
+        // 王车易位相关状态
+        this.kingMoved = { white: false, black: false };
+        this.rookMoved = {
+            white: { left: false, right: false },
+            black: { left: false, right: false }
+        };
+        
         this.pieceSymbols = {
             white: {
                 king: '♔',
@@ -369,6 +376,7 @@ class ChessGame {
     }
     
     calculateKingMoves(row, col, piece, moves) {
+        // 普通移动（周围一格）
         for (let dr = -1; dr <= 1; dr++) {
             for (let dc = -1; dc <= 1; dc++) {
                 if (dr === 0 && dc === 0) continue;
@@ -382,6 +390,65 @@ class ChessGame {
                 }
             }
         }
+        
+        // 王车易位
+        this.calculateCastlingMoves(row, col, piece, moves);
+    }
+    
+    calculateCastlingMoves(row, col, piece, moves) {
+        // 王必须在初始位置且未移动过
+        if ((piece.color === 'white' && row !== 7) || (piece.color === 'black' && row !== 0)) {
+            return;
+        }
+        
+        if (col !== 4) return; // 王必须在e列
+        if (this.kingMoved[piece.color]) return; // 王不能已经移动过
+        if (this.inCheck[piece.color]) return; // 王不能被将军时进行易位
+        
+        const kingRow = piece.color === 'white' ? 7 : 0;
+        
+        // 短易位（王翼易位）- 右侧车
+        if (!this.rookMoved[piece.color].right) {
+            // 检查f和g列是否为空
+            if (!this.board[kingRow][5] && !this.board[kingRow][6]) {
+                // 检查f1/g1（或f8/g8）是否被攻击
+                if (!this.isSquareAttacked(kingRow, 5, piece.color) && 
+                    !this.isSquareAttacked(kingRow, 6, piece.color)) {
+                    moves.push({ row: kingRow, col: 6, castling: 'kingside' });
+                }
+            }
+        }
+        
+        // 长易位（后翼易位）- 左侧车
+        if (!this.rookMoved[piece.color].left) {
+            // 检查b、c、d列是否为空
+            if (!this.board[kingRow][1] && !this.board[kingRow][2] && !this.board[kingRow][3]) {
+                // 检查c1/d1（或c8/d8）是否被攻击
+                if (!this.isSquareAttacked(kingRow, 2, piece.color) && 
+                    !this.isSquareAttacked(kingRow, 3, piece.color)) {
+                    moves.push({ row: kingRow, col: 2, castling: 'queenside' });
+                }
+            }
+        }
+    }
+    
+    // 检查某个格子是否被对方攻击
+    isSquareAttacked(row, col, color) {
+        const opponentColor = color === 'white' ? 'black' : 'white';
+        
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const piece = this.board[r][c];
+                if (piece && piece.color === opponentColor) {
+                    // 检查这个棋子是否能攻击到指定位置
+                    if (this.canAttackPiece(r, c, row, col)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
     }
     
     calculateSlidingMoves(row, col, piece, directions, moves) {
@@ -438,6 +505,15 @@ class ChessGame {
         const piece = this.board[fromRow][fromCol];
         const capturedPiece = this.board[toRow][toCol];
         
+        // 处理王车易位
+        let isCastling = false;
+        let castlingType = null;
+        
+        if (piece.type === 'king' && Math.abs(toCol - fromCol) === 2) {
+            isCastling = true;
+            castlingType = toCol > fromCol ? 'kingside' : 'queenside';
+        }
+        
         // 记录被吃掉的棋子
         if (capturedPiece) {
             this.capturedPieces[this.currentPlayer].push(capturedPiece);
@@ -446,6 +522,36 @@ class ChessGame {
         // 执行移动
         this.board[toRow][toCol] = piece;
         this.board[fromRow][fromCol] = null;
+        
+        // 处理王车易位时车的移动
+        if (isCastling) {
+            let rookFromCol, rookToCol;
+            
+            if (castlingType === 'kingside') {
+                // 短易位：车从h列移动到f列
+                rookFromCol = 7;
+                rookToCol = 5;
+            } else {
+                // 长易位：车从a列移动到d列
+                rookFromCol = 0;
+                rookToCol = 3;
+            }
+            
+            const rook = this.board[fromRow][rookFromCol];
+            this.board[fromRow][rookToCol] = rook;
+            this.board[fromRow][rookFromCol] = null;
+        }
+        
+        // 更新王和车的移动状态
+        if (piece.type === 'king') {
+            this.kingMoved[piece.color] = true;
+        } else if (piece.type === 'rook') {
+            if (fromCol === 0) { // a列的车
+                this.rookMoved[piece.color].left = true;
+            } else if (fromCol === 7) { // h列的车
+                this.rookMoved[piece.color].right = true;
+            }
+        }
         
         // 检查兵是否到达底线需要晋升
         if (piece.type === 'pawn' && (toRow === 0 || toRow === 7)) {
@@ -456,7 +562,7 @@ class ChessGame {
         }
         
         // 记录走棋历史
-        const moveNotation = this.getMoveNotation(fromRow, fromCol, toRow, toCol, capturedPiece);
+        const moveNotation = this.getMoveNotation(fromRow, fromCol, toRow, toCol, capturedPiece, isCastling, castlingType);
         this.moveHistory.push({
             player: this.currentPlayer,
             from: { row: fromRow, col: fromCol },
@@ -478,7 +584,12 @@ class ChessGame {
         this.updateMoveHistory();
     }
     
-    getMoveNotation(fromRow, fromCol, toRow, toCol, capturedPiece) {
+    getMoveNotation(fromRow, fromCol, toRow, toCol, capturedPiece, isCastling, castlingType) {
+        // 王车易位有特殊记谱
+        if (isCastling) {
+            return castlingType === 'kingside' ? 'O-O' : 'O-O-O';
+        }
+        
         const piece = this.board[toRow][toCol];
         const files = 'abcdefgh';
         const fromFile = files[fromCol];
@@ -733,6 +844,13 @@ class ChessGame {
         this.capturedPieces = { white: [], black: [] };
         this.gameOver = false;
         this.inCheck = { white: false, black: false };
+        
+        // 重置王车易位状态
+        this.kingMoved = { white: false, black: false };
+        this.rookMoved = {
+            white: { left: false, right: false },
+            black: { left: false, right: false }
+        };
         
         this.createBoard();
         this.renderBoard();
