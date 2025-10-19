@@ -58,6 +58,7 @@ class FallingGame {
         const container = this.canvas.parentElement;
         this.canvas.width = Math.min(800, container.clientWidth);
         this.canvas.height = Math.min(600, window.innerHeight * 0.6);
+        console.log('画布尺寸调整:', this.canvas.width, this.canvas.height);
     }
 
     changeDifficulty(level) {
@@ -71,16 +72,16 @@ class FallingGame {
         // 调整游戏参数
         switch(level) {
             case 'easy':
-                this.gameSpeed = 1;
-                this.spawnInterval = 120;
+                this.gameSpeed = 0.5; // 减慢整体速度
+                this.spawnInterval = 180; // 增加生成间隔
                 break;
             case 'medium':
-                this.gameSpeed = 1.5;
-                this.spawnInterval = 90;
+                this.gameSpeed = 0.8;
+                this.spawnInterval = 120;
                 break;
             case 'hard':
-                this.gameSpeed = 2;
-                this.spawnInterval = 60;
+                this.gameSpeed = 1.0;
+                this.spawnInterval = 90;
                 break;
         }
     }
@@ -177,34 +178,17 @@ class FallingGame {
         this.blocks.forEach((block, index) => {
             console.log(`绘制方块 ${index}:`, block.text, '位置:', block.x, block.y);
             
-            // 方块阴影
-            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            this.ctx.shadowBlur = 10;
-            this.ctx.shadowOffsetX = 2;
-            this.ctx.shadowOffsetY = 2;
-            
-            // 方块主体
-            const gradient = this.ctx.createLinearGradient(block.x, block.y, block.x, block.y + block.height);
-            gradient.addColorStop(0, block.color);
-            gradient.addColorStop(1, this.darkenColor(block.color));
-            
-            this.ctx.fillStyle = gradient;
+            // 简化绘制，确保方块可见
+            this.ctx.fillStyle = 'white';
             this.ctx.fillRect(block.x, block.y, block.width, block.height);
             
-            // 方块边框
-            this.ctx.strokeStyle = this.darkenColor(block.color);
-            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 'black';
+            this.ctx.lineWidth = 3;
             this.ctx.strokeRect(block.x, block.y, block.width, block.height);
             
-            // 重置阴影
-            this.ctx.shadowColor = 'transparent';
-            this.ctx.shadowBlur = 0;
-            this.ctx.shadowOffsetX = 0;
-            this.ctx.shadowOffsetY = 0;
-            
-            // 绘制文字
-            this.ctx.fillStyle = 'white';
-            this.ctx.font = 'bold 20px Roboto';
+            // 绘制文字 - 黑色文字
+            this.ctx.fillStyle = 'black';
+            this.ctx.font = 'bold 24px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             this.ctx.fillText(block.text, block.x + block.width / 2, block.y + block.height / 2);
@@ -245,18 +229,19 @@ class FallingGame {
         const text = words[Math.floor(Math.random() * words.length)];
         
         const block = {
-            x: Math.random() * (this.canvas.width - 100),
-            y: 50 + Math.random() * 100, // 改为在画布内生成
-            width: 80,
-            height: 40,
+            x: 100 + Math.random() * (this.canvas.width - 200), // 确保不会太靠边
+            y: 50, // 固定在顶部位置
+            width: 120, // 增大方块尺寸
+            height: 60,
             text: text,
-            speed: 1 + Math.random() * 0.5,
+            speed: 0.3 + Math.random() * 0.3, // 减慢下落速度
             color: this.getRandomColor()
         };
         
         this.blocks.push(block);
-        console.log('生成方块:', text, '位置:', block.x, block.y, '当前方块数量:', this.blocks.length);
+        console.log('生成方块:', text, '位置:', block.x, block.y, '尺寸:', block.width, block.height);
         console.log('画布尺寸:', this.canvas.width, this.canvas.height);
+        console.log('当前方块数量:', this.blocks.length);
     }
 
     getRandomColor() {
@@ -748,5 +733,13 @@ document.head.appendChild(style);
 
 // 初始化游戏
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM加载完成，初始化方块下落游戏');
     window.fallingGame = new FallingGame();
+    
+    // 确保在页面切换时也能正确初始化
+    setTimeout(() => {
+        if (window.fallingGame && window.fallingGame.canvas) {
+            console.log('画布尺寸检查:', window.fallingGame.canvas.width, window.fallingGame.canvas.height);
+        }
+    }, 100);
 });
