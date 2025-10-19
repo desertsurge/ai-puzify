@@ -40,58 +40,161 @@
             </div>
             
             <div class="game-controls">
-                <div class="rules-section">
-                    <h3>游戏规则</h3>
-                    <div class="rules-content">
-                        <h4>🎯 棋子移动规则</h4>
-                        <div class="rule-item">
-                            <span class="piece-icon">♙</span>
-                            <strong>兵 (Pawn)</strong>: 直走斜吃，起始位置可走两格
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="status">状态</button>
+                    <button class="tab-button" data-tab="rules">规则</button>
+                </div>
+                
+                <div class="tab-content active" id="status-tab">
+                    <div class="game-status-section">
+                        <h3>游戏状态</h3>
+                        <div class="status-info">
+                            <div class="captured-pieces">
+                                <h4>被吃掉的棋子</h4>
+                                <div class="white-captured" id="white-captured"></div>
+                                <div class="black-captured" id="black-captured"></div>
+                            </div>
+                            
+                            <div class="move-history">
+                                <h4>走棋记录</h4>
+                                <div id="move-history"></div>
+                            </div>
                         </div>
-                        <div class="rule-item">
-                            <span class="piece-icon">♘</span>
-                            <strong>马 (Knight)</strong>: L形移动（先横/竖走两格，再竖/横走一格）
-                        </div>
-                        <div class="rule-item">
-                            <span class="piece-icon">♗</span>
-                            <strong>象 (Bishop)</strong>: 斜线移动，不限格数
-                        </div>
-                        <div class="rule-item">
-                            <span class="piece-icon">♖</span>
-                            <strong>车 (Rook)</strong>: 直线移动，不限格数
-                        </div>
-                        <div class="rule-item">
-                            <span class="piece-icon">♕</span>
-                            <strong>后 (Queen)</strong>: 直线和斜线移动，不限格数
-                        </div>
-                        <div class="rule-item">
-                            <span class="piece-icon">♔</span>
-                            <strong>王 (King)</strong>: 周围一格移动
-                        </div>
-                        
-                        <h4>🎮 游戏玩法</h4>
-                        <ol class="gameplay-steps">
-                            <li>点击棋子选中（高亮显示）</li>
-                            <li>绿色格子表示可移动位置</li>
-                            <li>粉色格子表示可吃子位置</li>
-                            <li>点击目标位置完成移动</li>
-                            <li>轮流走棋，直到一方获胜</li>
-                        </ol>
-                        
-                        <h4>🏆 胜利条件</h4>
-                        <p>将死对方的王即为胜利！</p>
                     </div>
                 </div>
                 
-                <div class="captured-pieces">
-                    <h3>被吃掉的棋子</h3>
-                    <div class="white-captured" id="white-captured"></div>
-                    <div class="black-captured" id="black-captured"></div>
-                </div>
-                
-                <div class="move-history">
-                    <h3>走棋记录</h3>
-                    <div id="move-history"></div>
+                <div class="tab-content" id="rules-tab">
+                    <div class="rules-section">
+                        <h3>🎯 国际象棋规则</h3>
+                        <div class="rules-content">
+                            <div class="rules-grid">
+                                <div class="rules-column">
+                                    <h4>♟️ 棋子移动规则</h4>
+                                    <div class="rule-card">
+                                        <div class="piece-header">
+                                            <span class="piece-icon">♙</span>
+                                            <strong>兵 (Pawn)</strong>
+                                        </div>
+                                        <ul class="rule-details">
+                                            <li>直走一格，不能后退</li>
+                                            <li>起始位置可前进两格</li>
+                                            <li>斜吃一格，不能直吃</li>
+                                            <li>到达底线必须晋升</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="rule-card">
+                                        <div class="piece-header">
+                                            <span class="piece-icon">♘</span>
+                                            <strong>马 (Knight)</strong>
+                                        </div>
+                                        <ul class="rule-details">
+                                            <li>L形移动（2格+1格）</li>
+                                            <li>可以跳过其他棋子</li>
+                                            <li>唯一可以跳跃的棋子</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="rule-card">
+                                        <div class="piece-header">
+                                            <span class="piece-icon">♗</span>
+                                            <strong>象 (Bishop)</strong>
+                                        </div>
+                                        <ul class="rule-details">
+                                            <li>斜线移动，不限格数</li>
+                                            <li>不能跳过其他棋子</li>
+                                            <li>每个象固定颜色格</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="rules-column">
+                                    <div class="rule-card">
+                                        <div class="piece-header">
+                                            <span class="piece-icon">♖</span>
+                                            <strong>车 (Rook)</strong>
+                                        </div>
+                                        <ul class="rule-details">
+                                            <li>直线移动，不限格数</li>
+                                            <li>不能跳过其他棋子</li>
+                                            <li>参与王车易位</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="rule-card">
+                                        <div class="piece-header">
+                                            <span class="piece-icon">♕</span>
+                                            <strong>后 (Queen)</strong>
+                                        </div>
+                                        <ul class="rule-details">
+                                            <li>直线和斜线移动</li>
+                                            <li>威力最强大的棋子</li>
+                                            <li>不能跳过其他棋子</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="rule-card">
+                                        <div class="piece-header">
+                                            <span class="piece-icon">♔</span>
+                                            <strong>王 (King)</strong>
+                                        </div>
+                                        <ul class="rule-details">
+                                            <li>周围一格移动</li>
+                                            <li>不能被吃掉</li>
+                                            <li>参与王车易位</li>
+                                            <li>被将军必须解除</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4>🎮 游戏玩法</h4>
+                            <div class="gameplay-info">
+                                <div class="info-card">
+                                    <h5>操作说明</h5>
+                                    <ol>
+                                        <li>点击选中棋子（高亮显示）</li>
+                                        <li>绿色圆点表示可移动位置</li>
+                                        <li>粉色格子表示可吃子位置</li>
+                                        <li>点击目标位置完成移动</li>
+                                        <li>白方先走，轮流走棋</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="info-card">
+                                    <h5>🏆 胜利条件</h5>
+                                    <ul>
+                                        <li><strong>将死</strong>: 对方王被将军且无法解除</li>
+                                        <li><strong>认输</strong>: 玩家主动认输</li>
+                                        <li><strong>超时</strong>: 计时模式下超时判负</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <h4>⚠️ 特殊规则</h4>
+                            <div class="special-rules">
+                                <div class="special-rule">
+                                    <h5>♟️ 兵晋升</h5>
+                                    <p>兵到达对方底线时，必须晋升为后、车、象或马（不能保持为兵或晋升为王）</p>
+                                </div>
+                                
+                                <div class="special-rule">
+                                    <h5>⚔️ 将军规则</h5>
+                                    <p>当王被将军时，必须优先解除将军状态，不能走其他无关的棋</p>
+                                </div>
+                                
+                                <div class="special-rule">
+                                    <h5>🔄 王车易位</h5>
+                                    <p>特定条件下，王和车可以同时移动的特殊走法（本游戏暂未实现）</p>
+                                </div>
+                                
+                                <div class="special-rule">
+                                    <h5>🥷 吃过路兵</h5>
+                                    <p>兵特定条件下的特殊吃子规则（本游戏暂未实现）</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -7,23 +7,26 @@
 body {
     font-family: Arial, "Microsoft YaHei", sans-serif;
     margin: 0;
-    padding: 2px;  /* 减少整体边距 */
+    padding: 0;  /* 完全消除边距 */
     background-color: #f0e6d2;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;  /* 防止出现滚动条 */
 }
 
 .container {
     text-align: center;
     background: white;
-    padding: 8px;  /* 减少容器内边距 */
-    border-radius: 6px;  /* 减少圆角 */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* 减少阴影 */
+    padding: 4px;  /* 进一步减少容器内边距 */
+    border-radius: 4px;  /* 进一步减少圆角 */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);  /* 进一步减少阴影 */
     max-width: 100%;
+    max-height: 100vh;  /* 限制容器最大高度 */
     width: auto;
-    margin: 2px;  /* 减少容器外边距 */
+    margin: 0;  /* 完全消除容器外边距 */
+    overflow: hidden;  /* 防止内容溢出 */
 }
 
 h1 {
@@ -65,11 +68,11 @@ h1 {
     border: 2px solid #5d4037;
     border-radius: 5px;
     position: relative;
-    margin: 8px auto;  /* 减少边距 */
-    width: 95vw;  /* 增加棋盘宽度比例 */
-    height: 95vw;  /* 增加棋盘高度比例 */
-    max-width: none;  /* 移除最大宽度限制，让屏幕充分利用 */
-    max-height: none;  /* 移除最大高度限制，让屏幕充分利用 */
+    margin: 4px auto;  /* 进一步减少边距 */
+    width: 90vw;  /* 减少棋盘宽度比例，留出更多空白 */
+    height: 90vw;  /* 减少棋盘高度比例 */
+    max-width: calc(100vh - 200px);  /* 考虑标题和按钮的高度 */
+    max-height: calc(100vh - 200px);  /* 确保棋盘不会超出屏幕高度 */
     aspect-ratio: 1/1;  /* 确保棋盘是正方形 */
     overflow: hidden;
 }
@@ -87,6 +90,10 @@ h1 {
     cursor: pointer;
     z-index: 2;
     transform: translate(-50%, -50%);
+    width: 30px;  /* 设置点击区域大小 */
+    height: 30px;  /* 设置点击区域大小 */
+    background-color: transparent;  /* 透明背景 */
+    border-radius: 50%;  /* 圆形点击区域 */
 }
 
 .stone {
@@ -95,6 +102,8 @@ h1 {
     z-index: 3;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     transform: translate(-50%, -50%);
+    width: 28px;  /* 棋子大小 */
+    height: 28px;  /* 棋子大小 */
 }
 
 .stone.black {
@@ -146,6 +155,30 @@ button:hover {
     border-radius: 50%;
     z-index: 4;
     transform: translate(-50%, -50%);
+}
+
+/* 响应式设计 - 大屏幕PC设备 */
+@media (min-width: 1200px) {
+    .game-board {
+        width: 85vw;  /* 在大屏幕上使用更小的比例 */
+        height: 85vw;  /* 在大屏幕上使用更小的比例 */
+        max-width: calc(100vh - 150px);  /* 更宽松的高度限制 */
+        max-height: calc(100vh - 150px);  /* 更宽松的高度限制 */
+        margin: 8px auto;  /* 增加边距让棋盘更有呼吸感 */
+    }
+    
+    h1 {
+        font-size: 1.5em;  /* 增大标题字体 */
+        margin-bottom: 12px;  /* 增加下边距 */
+    }
+    
+    .game-info {
+        font-size: 16px;  /* 增大信息字体 */
+    }
+    
+    .container {
+        padding: 12px;  /* 增加容器内边距 */
+    }
 }
 
 /* 响应式设计 - 平板及小屏幕设备 */

@@ -299,11 +299,77 @@ h1 {
     backdrop-filter: blur(10px);
 }
 
+/* 选项卡样式 */
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-button:hover {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.tab-button.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.game-status-section {
+    margin-bottom: 0;
+}
+
 .rules-section, .captured-pieces, .move-history {
     margin-bottom: 20px;
 }
 
-.rules-section h3, .captured-pieces h3, .move-history h3 {
+.status-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.rules-section h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.4rem;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.captured-pieces h3, .move-history h3 {
     color: #2c3e50;
     margin-bottom: 10px;
     border-bottom: 2px solid #3498db;
@@ -313,11 +379,19 @@ h1 {
 .rules-content {
     background: #f8f9fa;
     border-radius: 8px;
-    padding: 15px;
+    padding: 20px;
     margin-top: 10px;
 }
 
 .rules-content h4 {
+    color: #2c3e50;
+    margin: 25px 0 15px 0;
+    font-size: 1.2rem;
+    border-left: 4px solid #3498db;
+    padding-left: 10px;
+}
+
+.rules-content h5 {
     color: #2c3e50;
     margin: 15px 0 10px 0;
     font-size: 1.1rem;
@@ -343,6 +417,121 @@ h1 {
     font-weight: bold;
     min-width: 30px;
     text-align: center;
+}
+
+/* 规则网格布局 */
+.rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* 规则卡片样式 */
+.rule-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #3498db;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rule-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.piece-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 8px;
+}
+
+.piece-header .piece-icon {
+    font-size: 2rem;
+    margin-right: 10px;
+}
+
+.piece-header strong {
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.rule-details {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.rule-details li {
+    margin-bottom: 5px;
+    color: #495057;
+    line-height: 1.4;
+}
+
+/* 游戏玩法布局 */
+.gameplay-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.info-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #27ae60;
+}
+
+.info-card h5 {
+    color: #27ae60;
+    margin-top: 0;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 8px;
+}
+
+.info-card ol,
+.info-card ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.info-card li {
+    margin-bottom: 5px;
+    color: #495057;
+    line-height: 1.4;
+}
+
+/* 特殊规则样式 */
+.special-rules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.special-rule {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 4px solid #f39c12;
+}
+
+.special-rule h5 {
+    color: #f39c12;
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+}
+
+.special-rule p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+    line-height: 1.4;
 }
 
 .gameplay-steps {
@@ -386,6 +575,14 @@ h1 {
 .captured-piece {
     font-size: 1.5rem;
     margin: 2px;
+}
+
+.captured-pieces h4, .move-history h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 5px;
+    font-size: 1.1rem;
 }
 
 #move-history {

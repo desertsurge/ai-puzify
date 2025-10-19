@@ -87,6 +87,39 @@ class ChessGame {
         document.getElementById('toggle-rules-mobile').addEventListener('click', () => {
             this.toggleRulesMobile();
         });
+        
+        // 选项卡切换事件
+        this.setupTabEvents();
+    }
+    
+    setupTabEvents() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+                this.switchTab(tabId);
+            });
+        });
+    }
+    
+    switchTab(tabId) {
+        // 移除所有激活状态
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // 激活选中的选项卡
+        const activeButton = document.querySelector(`[data-tab="${tabId}"]`);
+        const activeContent = document.getElementById(`${tabId}-tab`);
+        
+        if (activeButton && activeContent) {
+            activeButton.classList.add('active');
+            activeContent.classList.add('active');
+        }
     }
     
     renderBoard() {
@@ -709,15 +742,8 @@ class ChessGame {
     }
     
     toggleRulesMobile() {
-        const rulesContent = document.querySelector('.rules-content');
-        if (rulesContent) {
-            rulesContent.classList.toggle('collapsed');
-            
-            const toggleButton = document.getElementById('toggle-rules-mobile');
-            if (toggleButton) {
-                toggleButton.textContent = rulesContent.classList.contains('collapsed') ? '显示规则' : '隐藏规则';
-            }
-        }
+        // 移动端切换到规则选项卡
+        this.switchTab('rules');
     }
     
     toggleRules() {

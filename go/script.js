@@ -266,12 +266,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to calculate dynamic board size
     function calculateBoardSize() {
-        // Calculate available width (use higher percentage for mobile to maximize board area)
+        // Calculate available size considering both width and height constraints
         const isMobile = window.innerWidth <= 768;
-        const percentage = isMobile ? 0.98 : 0.9; // Use 98% on mobile, 90% on desktop
-        const maxWidth = window.innerWidth * percentage; // 移除500px的限制，让屏幕充分利用
-        // For 19x19 board, we need to account for the grid spacing
-        return maxWidth;
+        const widthPercentage = isMobile ? 0.95 : 0.9; // 与CSS保持一致
+        const heightAllowance = 200; // 为标题和按钮预留的空间
+        
+        const maxWidth = window.innerWidth * widthPercentage;
+        const maxHeight = window.innerHeight - heightAllowance;
+        
+        // 使用较小的值以确保棋盘完全可见
+        return Math.min(maxWidth, maxHeight);
     }
 
     // Create the game board
