@@ -9,6 +9,15 @@
 <body>
     <div class="container">
         <h1>井字棋游戏</h1>
+        <div class="rules">
+            <h2>玩法规则</h2>
+            <ul>
+                <li>两名玩家轮流在3×3的棋盘上放置自己的标记（X或O）</li>
+                <li>玩家X先手，然后是玩家O</li>
+                <li>率先在水平、垂直或对角线上连成三个相同标记的玩家获胜</li>
+                <li>如果所有格子都被填满而没有玩家获胜，则为平局</li>
+            </ul>
+        </div>
         <div class="status">当前玩家: <span id="current-player">X</span></div>
         <div class="board" id="board">
             <div class="cell" data-index="0"></div>
