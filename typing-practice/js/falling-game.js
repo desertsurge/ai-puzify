@@ -2,7 +2,8 @@ class FallingGame {
     constructor() {
         this.canvas = document.getElementById('falling-canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.blocks = [];
+        this.blocks = []; // 下落的文字
+        this.stackedWords = []; // 堆积在底部的文字
         this.particles = [];
         this.gameActive = false;
         this.score = 0;
@@ -64,6 +65,16 @@ class FallingGame {
         if (this.ctx) {
             this.ctx.fillStyle = 'white';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.drawGrid();
+            // 绘制堆积的文字
+            this.ctx.fillStyle = '#333';
+            this.ctx.font = 'bold 20px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.stackedWords.forEach((word, index) => {
+                const y = this.canvas.height - 30 - (index * 25);
+                this.ctx.fillText(word.text, word.x, y);
+            });
         }
     }
 
@@ -111,6 +122,16 @@ class FallingGame {
         if (this.ctx) {
             this.ctx.fillStyle = 'white';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.drawGrid();
+            // 绘制堆积的文字
+            this.ctx.fillStyle = '#333';
+            this.ctx.font = 'bold 20px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.stackedWords.forEach((word, index) => {
+                const y = this.canvas.height - 30 - (index * 25);
+                this.ctx.fillText(word.text, word.x, y);
+            });
         }
         
         // 立即生成几个方块用于测试
@@ -133,6 +154,7 @@ class FallingGame {
 
     resetGame() {
         this.blocks = [];
+        this.stackedWords = [];
         this.particles = [];
         this.score = 0;
         this.lives = 3;
@@ -167,11 +189,20 @@ class FallingGame {
             const block = this.blocks[i];
             block.y += block.speed * this.gameSpeed;
             
-            // 检查是否到达底部
-            if (block.y + block.height > this.canvas.height) {
-                console.log('方块到达底部:', block.text);
+            // 检查是否到达底部（堆积区域）
+            if (block.y + block.height >= this.canvas.height - this.stackedWords.length * 25 - 30) {
+                console.log('文字到达底部堆积:', block.text);
+                // 将文字添加到堆积数组
+                this.stackedWords.push({
+                    text: block.text,
+                    x: block.x + block.width / 2
+                });
                 this.blocks.splice(i, 1);
-                this.loseLife();
+                
+                // 检查是否堆积到顶部（游戏失败）
+                if (this.stackedWords.length * 25 >= this.canvas.height - 100) {
+                    this.gameOver();
+                }
             }
         }
         
@@ -201,21 +232,26 @@ class FallingGame {
         // 绘制网格背景
         this.drawGrid();
         
-        // 绘制方块
-        console.log('绘制方块数量:', this.blocks.length);
+        // 绘制堆积的文字（底部）
+        this.ctx.fillStyle = '#333';
+        this.ctx.font = 'bold 20px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        
+        this.stackedWords.forEach((word, index) => {
+            // 绘制堆积的文字，从底部开始排列
+            const x = word.x;
+            const y = this.canvas.height - 30 - (index * 25); // 每行25px高度，从底部30px开始
+            this.ctx.fillText(word.text, x, y);
+        });
+        
+        // 绘制下落的文字（无方块背景）
+        console.log('绘制下落文字数量:', this.blocks.length);
         this.blocks.forEach((block, index) => {
-            console.log(`绘制方块 ${index}:`, block.text, '位置:', block.x, block.y);
+            console.log(`绘制下落文字 ${index}:`, block.text, '位置:', block.x, block.y);
             
-            // 简化绘制，确保方块可见
-            this.ctx.fillStyle = 'white';
-            this.ctx.fillRect(block.x, block.y, block.width, block.height);
-            
-            this.ctx.strokeStyle = 'black';
-            this.ctx.lineWidth = 3;
-            this.ctx.strokeRect(block.x, block.y, block.width, block.height);
-            
-            // 绘制文字 - 黑色文字
-            this.ctx.fillStyle = 'black';
+            // 只绘制文字，不绘制方块背景
+            this.ctx.fillStyle = '#e74c3c'; // 使用醒目的红色
             this.ctx.font = 'bold 24px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
@@ -259,17 +295,18 @@ class FallingGame {
         const block = {
             x: 100 + Math.random() * (this.canvas.width - 200), // 确保不会太靠边
             y: 50, // 固定在顶部位置
-            width: 120, // 增大方块尺寸
-            height: 60,
+            width: 120, // 文字占位尺寸（用于碰撞检测）
+            height: 30, // 减小高度，只显示文字
             text: text,
-            speed: 0.3 + Math.random() * 0.3, // 减慢下落速度
-            color: this.getRandomColor()
+            speed: 0.3 + Math.random() * 0.3, // 下落速度
+            color: '#e74c3c' // 统一使用红色
         };
         
         this.blocks.push(block);
-        console.log('生成方块:', text, '位置:', block.x, block.y, '尺寸:', block.width, block.height);
+        console.log('生成下落文字:', text, '位置:', block.x, block.y);
         console.log('画布尺寸:', this.canvas.width, this.canvas.height);
-        console.log('当前方块数量:', this.blocks.length);
+        console.log('当前下落文字数量:', this.blocks.length);
+        console.log('当前堆积文字数量:', this.stackedWords.length);
     }
 
     getRandomColor() {
@@ -296,18 +333,24 @@ class FallingGame {
         const inputText = e.target.value.trim();
         if (!inputText) return;
         
-        // 查找匹配的方块
-        let blockFound = false;
+        let targetFound = false;
+        
+        // 首先查找下落的方块
         for (let i = this.blocks.length - 1; i >= 0; i--) {
             const block = this.blocks[i];
             if (block.text === inputText) {
                 this.destroyBlock(block, i);
-                blockFound = true;
+                targetFound = true;
                 break;
             }
         }
         
-        if (blockFound) {
+        // 如果没有找到下落的方块，查找堆积的文字
+        if (!targetFound) {
+            targetFound = this.destroyStackedWord(inputText);
+        }
+        
+        if (targetFound) {
             e.target.value = '';
             this.combo++;
             if (this.combo > this.maxCombo) {
@@ -336,6 +379,25 @@ class FallingGame {
         
         // 播放音效
         this.playDestroySound();
+    }
+
+    // 新增：从堆积的文字中移除匹配的文字
+    destroyStackedWord(text) {
+        for (let i = this.stackedWords.length - 1; i >= 0; i--) {
+            if (this.stackedWords[i].text === text) {
+                // 创建粒子效果
+                this.createParticles(this.stackedWords[i].x, this.canvas.height - 30 - (i * 25), '#e74c3c');
+                this.stackedWords.splice(i, 1);
+                
+                // 增加分数和统计
+                this.score += 15 * this.level; // 堆积的文字分数更高
+                this.blocksDestroyed++;
+                
+                this.updateUI();
+                return true;
+            }
+        }
+        return false;
     }
 
     createParticles(x, y, color) {
@@ -564,19 +626,42 @@ class FallingGame {
             date: new Date().toISOString(),
             score: this.score,
             level: this.level,
-            blocksDestroyed: this.blocksDestroyed,
+            difficulty: this.difficulty,
             maxCombo: this.maxCombo,
-            difficulty: this.currentDifficulty
+            totalBlocks: this.totalBlocks,
+            destroyedBlocks: this.destroyedBlocks,
+            stackedWordsCount: this.stackedWords.length,
+            gameMode: 'falling',
+            playTime: Math.floor((Date.now() - this.startTime) / 1000)
         };
         
         let allStats = JSON.parse(localStorage.getItem('fallingGameStats') || '[]');
         allStats.push(stats);
         
+        // 只保留最近100条记录
         if (allStats.length > 100) {
             allStats = allStats.slice(-100);
         }
         
         localStorage.setItem('fallingGameStats', JSON.stringify(allStats));
+        
+        // 同时保存到统一的游戏统计中
+        this.saveToUnifiedStats(stats);
+    }
+    
+    saveToUnifiedStats(fallingStats) {
+        let unifiedStats = JSON.parse(localStorage.getItem('unifiedGameStats') || '[]');
+        unifiedStats.push({
+            ...fallingStats,
+            gameMode: 'falling'
+        });
+        
+        // 只保留最近200条记录
+        if (unifiedStats.length > 200) {
+            unifiedStats = unifiedStats.slice(-200);
+        }
+        
+        localStorage.setItem('unifiedGameStats', JSON.stringify(unifiedStats));
     }
 
     loadSettings() {

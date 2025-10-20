@@ -42,6 +42,15 @@ class App {
                     window.fallingGame.ctx.fillStyle = 'white';
                     window.fallingGame.ctx.fillRect(0, 0, window.fallingGame.canvas.width, window.fallingGame.canvas.height);
                     window.fallingGame.drawGrid();
+                    // 重绘堆积的文字
+                    window.fallingGame.ctx.fillStyle = '#333';
+                    window.fallingGame.ctx.font = 'bold 20px Arial';
+                    window.fallingGame.ctx.textAlign = 'center';
+                    window.fallingGame.ctx.textBaseline = 'middle';
+                    window.fallingGame.stackedWords.forEach((word, index) => {
+                        const y = window.fallingGame.canvas.height - 30 - (index * 25);
+                        window.fallingGame.ctx.fillText(word.text, word.x, y);
+                    });
                 }
             }
         });

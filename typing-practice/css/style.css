@@ -497,6 +497,26 @@ body {
     color: #2d3748;
 }
 
+.mode-comparison {
+    margin-top: 15px;
+    height: 250px;
+}
+
+.mode-comparison canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#classic-stats .stat-item,
+#falling-stats .stat-item {
+    padding: 8px 0;
+}
+
+#classic-stats .stat-value,
+#falling-stats .stat-value {
+    font-size: 1em;
+}
+
 /* 设置页面 */
 .settings-container {
     display: grid;
@@ -876,6 +896,16 @@ body.dark-theme .stat-label {
     color: #a0aec0;
 }
 
+body.dark-theme #classic-stats .stat-item,
+body.dark-theme #falling-stats .stat-item {
+    background: #4a5568;
+}
+
+body.dark-theme #classic-stats .stat-value,
+body.dark-theme #falling-stats .stat-value {
+    color: #9f7aea;
+}
+
 body.dark-theme #user-input {
     background: #4a5568;
     border-color: #718096;
@@ -942,12 +972,17 @@ body.dark-theme .result-item {
 }
 
 @keyframes scorePopup {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-30px);
-    }
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    50% { transform: translateY(-30px) scale(1.2); opacity: 1; }
+    100% { transform: translateY(-50px) scale(1); opacity: 0; }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
 }

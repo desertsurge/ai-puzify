@@ -21,36 +21,73 @@ class StatsManager {
     bindEvents() {
         this.elements.resetStatsBtn.addEventListener('click', () => this.resetStats());
         this.elements.exportStatsBtn.addEventListener('click', () => this.exportStats());
+        
+        const importBtn = document.getElementById('import-stats');
+        const importFile = document.getElementById('import-file');
+        
+        if (importBtn) {
+            importBtn.addEventListener('click', () => importFile.click());
+        }
+        
+        if (importFile) {
+            importFile.addEventListener('change', (e) => this.importStats(e));
+        }
     }
 
     getAllStats() {
         return JSON.parse(localStorage.getItem('typingGameStats') || '[]');
     }
+    
+    getAllFallingStats() {
+        return JSON.parse(localStorage.getItem('fallingGameStats') || '[]');
+    }
+    
+    getAllUnifiedStats() {
+        return JSON.parse(localStorage.getItem('unifiedGameStats') || '[]');
+    }
 
     updateStatsDisplay() {
-        const stats = this.getAllStats();
+        const classicStats = this.getAllStats();
+        const fallingStats = this.getAllFallingStats();
+        const unifiedStats = this.getAllUnifiedStats();
         
-        if (stats.length === 0) {
+        // 计算总体统计（包含两种模式）
+        const allStats = [...classicStats, ...fallingStats];
+        
+        if (allStats.length === 0) {
             this.elements.totalGames.textContent = '0';
             this.elements.avgSpeed.textContent = '0 字/分钟';
             this.elements.avgAccuracy.textContent = '0%';
             this.elements.maxCombo.textContent = '0';
             this.elements.speedProgress.style.width = '0%';
             this.elements.accuracyProgress.style.width = '0%';
+            
+            // 更新模式特定统计
+            this.updateModeSpecificStats(classicStats, fallingStats);
             return;
         }
 
         // 计算总体统计
-        const totalGames = stats.length;
-        const avgSpeed = Math.round(stats.reduce((sum, game) => sum + game.speed, 0) / totalGames);
-        const avgAccuracy = Math.round(stats.reduce((sum, game) => sum + game.accuracy, 0) / totalGames);
-        const maxCombo = Math.max(...stats.map(game => game.maxCombo));
+        const totalGames = allStats.length;
+        const classicGames = classicStats.length;
+        const fallingGames = fallingStats.length;
+        
+        // 计算经典模式平均数据
+        const avgSpeed = classicStats.length > 0 ? 
+            Math.round(classicStats.reduce((sum, game) => sum + game.speed, 0) / classicStats.length) : 0;
+        const avgAccuracy = classicStats.length > 0 ? 
+            Math.round(classicStats.reduce((sum, game) => sum + game.accuracy, 0) / classicStats.length) : 0;
+        const maxCombo = allStats.length > 0 ? 
+            Math.max(...allStats.map(game => game.maxCombo)) : 0;
 
         // 更新显示
         this.elements.totalGames.textContent = totalGames;
         this.elements.avgSpeed.textContent = `${avgSpeed} 字/分钟`;
         this.elements.avgAccuracy.textContent = `${avgAccuracy}%`;
         this.elements.maxCombo.textContent = maxCombo;
+        
+        // 更新模式特定统计
+        this.updateModeSpecificStats(classicStats, fallingStats);
 
         // 计算进度
         const speedProgress = Math.min((avgSpeed / 100) * 100, 100);
@@ -72,7 +109,203 @@ class StatsManager {
         }
 
         // 绘制图表
-        this.drawSpeedChart(stats);
+        this.drawSpeedChart(classicStats);
+        
+        // 绘制综合统计图表
+        this.drawUnifiedChart(unifiedStats);
+    }
+    
+    updateModeSpecificStats(classicStats, fallingStats) {
+        // 经典模式统计
+        const classicGames = classicStats.length;
+        const classicTotalChars = classicStats.reduce((sum, stat) => sum + (stat.totalChars || 0), 0);
+        const classicCorrectChars = classicStats.reduce((sum, stat) => sum + (stat.correctChars || 0), 0);
+        const classicCharAccuracy = classicTotalChars > 0 ? (classicCorrectChars / classicTotalChars * 100).toFixed(1) : 0;
+
+        const classicStatsEl = document.getElementById('classic-stats');
+        if (classicStatsEl) {
+            classicStatsEl.innerHTML = `
+                <div class="stat-item">
+                    <span class="stat-label">经典模式游戏数</span>
+                    <span class="stat-value">${classicGames}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">总输入字符</span>
+                    <span class="stat-value">${classicTotalChars}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">字符准确率</span>
+                    <span class="stat-value">${classicCharAccuracy}%</span>
+                </div>
+            `;
+        }
+
+        // 方块模式统计
+        const fallingGames = fallingStats.length;
+        const totalBlocks = fallingStats.reduce((sum, stat) => sum + (stat.totalBlocks || 0), 0);
+        const destroyedBlocks = fallingStats.reduce((sum, stat) => sum + (stat.destroyedBlocks || 0), 0);
+        const avgStackedWords = fallingGames > 0 ? (fallingStats.reduce((sum, stat) => sum + (stat.stackedWordsCount || 0), 0) / fallingGames).toFixed(1) : 0;
+
+        const fallingStatsEl = document.getElementById('falling-stats');
+        if (fallingStatsEl) {
+            fallingStatsEl.innerHTML = `
+                <div class="stat-item">
+                    <span class="stat-label">方块模式游戏数</span>
+                    <span class="stat-value">${fallingGames}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">总方块数</span>
+                    <span class="stat-value">${totalBlocks}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">销毁方块数</span>
+                    <span class="stat-value">${destroyedBlocks}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">平均堆积数</span>
+                    <span class="stat-value">${avgStackedWords}</span>
+                </div>
+            `;
+        }
+    }
+
+    // 添加数据导入导出功能
+    exportStats() {
+        const classicStats = this.getAllStats();
+        const fallingStats = this.getAllFallingStats();
+        const unifiedStats = this.getAllUnifiedStats();
+        
+        const exportData = {
+            classicStats,
+            fallingStats,
+            unifiedStats,
+            exportTime: new Date().toISOString()
+        };
+        
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `typing-stats-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+    }
+
+    importStats(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importData = JSON.parse(e.target.result);
+                
+                if (importData.classicStats) {
+                    localStorage.setItem('gameStats', JSON.stringify(importData.classicStats));
+                }
+                if (importData.fallingStats) {
+                    localStorage.setItem('fallingGameStats', JSON.stringify(importData.fallingStats));
+                }
+                if (importData.unifiedStats) {
+                    localStorage.setItem('unifiedGameStats', JSON.stringify(importData.unifiedStats));
+                }
+                
+                alert('统计数据导入成功！');
+                this.updateStatsDisplay();
+            } catch (error) {
+                alert('导入失败：文件格式错误');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // 重置统计数据
+    resetStats() {
+        if (confirm('确定要重置所有统计数据吗？此操作不可恢复！')) {
+            localStorage.removeItem('gameStats');
+            localStorage.removeItem('fallingGameStats');
+            localStorage.removeItem('unifiedGameStats');
+            
+            alert('统计数据已重置！');
+            this.updateStatsDisplay();
+        }
+    }
+    
+    drawUnifiedChart(unifiedStats) {
+        const canvas = document.getElementById('unified-chart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        
+        // 清除画布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (unifiedStats.length === 0) {
+            ctx.fillStyle = '#a0aec0';
+            ctx.font = '14px Roboto';
+            ctx.textAlign = 'center';
+            ctx.fillText('暂无数据', canvas.width / 2, canvas.height / 2);
+            return;
+        }
+        
+        // 按游戏模式分组数据
+        const classicData = unifiedStats.filter(stat => stat.gameMode === 'classic');
+        const fallingData = unifiedStats.filter(stat => stat.gameMode === 'falling');
+        
+        // 绘制模式对比图表
+        const padding = 40;
+        const chartWidth = canvas.width - padding * 2;
+        const chartHeight = canvas.height - padding * 2;
+        
+        // 绘制坐标轴
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, canvas.height - padding);
+        ctx.lineTo(canvas.width - padding, canvas.height - padding);
+        ctx.stroke();
+        
+        // 绘制模式对比柱状图
+        const barWidth = 60;
+        const barSpacing = 20;
+        const startX = padding + 50;
+        
+        // 经典模式数据
+        const classicScore = classicData.length > 0 ? 
+            Math.round(classicData.reduce((sum, game) => sum + game.score, 0) / classicData.length) : 0;
+        const maxScore = Math.max(classicScore, fallingData.length > 0 ? 
+            Math.round(fallingData.reduce((sum, game) => sum + game.score, 0) / fallingData.length) : 0, 100);
+        
+        // 经典模式柱状图
+        const classicBarHeight = (classicScore / maxScore) * chartHeight;
+        ctx.fillStyle = '#5a67d8';
+        ctx.fillRect(startX, canvas.height - padding - classicBarHeight, barWidth, classicBarHeight);
+        
+        // 经典模式标签
+        ctx.fillStyle = '#2d3748';
+        ctx.font = '14px Roboto';
+        ctx.textAlign = 'center';
+        ctx.fillText('经典模式', startX + barWidth / 2, canvas.height - padding + 20);
+        ctx.fillText(classicScore.toString(), startX + barWidth / 2, canvas.height - padding - classicBarHeight - 10);
+        
+        // 方块下落模式柱状图
+        const fallingScore = fallingData.length > 0 ? 
+            Math.round(fallingData.reduce((sum, game) => sum + game.score, 0) / fallingData.length) : 0;
+        const fallingBarHeight = (fallingScore / maxScore) * chartHeight;
+        ctx.fillStyle = '#e53e3e';
+        ctx.fillRect(startX + barWidth + barSpacing, canvas.height - padding - fallingBarHeight, barWidth, fallingBarHeight);
+        
+        // 方块下落模式标签
+        ctx.fillStyle = '#2d3748';
+        ctx.fillText('方块模式', startX + barWidth + barSpacing + barWidth / 2, canvas.height - padding + 20);
+        ctx.fillText(fallingScore.toString(), startX + barWidth + barSpacing + barWidth / 2, canvas.height - padding - fallingBarHeight - 10);
     }
 
     drawSpeedChart(stats) {

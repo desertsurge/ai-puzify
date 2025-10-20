@@ -227,6 +227,100 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="stat-card">
+                        <h3>经典模式详细统计</h3>
+                        <div id="classic-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">经典模式游戏数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">总输入字符</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">字符准确率</span>
+                                <span class="stat-value">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>方块模式详细统计</h3>
+                        <div id="falling-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">方块模式游戏数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">总方块数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">销毁方块数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">平均堆积数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>游戏模式对比</h3>
+                        <div class="mode-comparison">
+                            <canvas id="unified-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>经典模式详细统计</h3>
+                        <div id="classic-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">经典模式游戏数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">总输入字符</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">字符准确率</span>
+                                <span class="stat-value">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>方块模式详细统计</h3>
+                        <div id="falling-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">方块模式游戏数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">总方块数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">销毁方块数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">平均堆积数</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>游戏模式对比</h3>
+                        <div class="mode-comparison">
+                            <canvas id="unified-chart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -274,6 +368,8 @@
                         <h3>数据管理</h3>
                         <button class="btn btn-secondary" id="reset-stats">重置统计数据</button>
                         <button class="btn btn-secondary" id="export-stats">导出统计数据</button>
+                        <input type="file" id="import-file" accept=".json" style="display: none;">
+                        <button class="btn btn-secondary" id="import-stats">导入统计数据</button>
                     </div>
                 </div>
             </section>
