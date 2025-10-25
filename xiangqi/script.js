@@ -9,6 +9,8 @@ class XiangqiGame {
         this.kingPositions = { red: [9, 4], black: [0, 4] }; // Starting positions of kings
         this.inCheck = { red: false, black: false }; // Track check status
         this.fullRenderNeeded = true; // Flag to indicate if full render is needed
+        this.moveHistory = []; // 记录走棋历史
+        this.isReplaying = false; // 是否正在回放
         this.initializeGame();
     }
 
@@ -477,6 +479,17 @@ class XiangqiGame {
                     }
                 }
                 
+                // 记录走棋历史（如果不是在回放模式下）
+                if (!this.isReplaying) {
+                    this.moveHistory.push({
+                        from: [selectedRow, selectedCol],
+                        to: [row, col],
+                        piece: movingPiece,
+                        captured: originalPiece,
+                        player: this.currentPlayer
+                    });
+                }
+                
                 // Add moving animation class to the piece
                 const gameBoard = document.getElementById('game-board');
                 const pieceElements = gameBoard.querySelectorAll('.piece');
@@ -496,7 +509,17 @@ class XiangqiGame {
                 
                 // Check for check condition after the move
                 this.inCheck[this.currentPlayer] = this.isInCheck(this.currentPlayer);
-                if (this.inCheck[this.currentPlayer]) {
+                
+                // 检查是否绝杀（包括将军绝杀和困毙）
+                const isCheckmate = this.isCheckmate(this.currentPlayer);
+                if (isCheckmate) {
+                    // 绝杀！游戏结束（可能是将军绝杀或困毙）
+                    // 无论是哪种绝杀情况，都使用相同的处理流程
+                    this.gameOver = true;
+                    const winner = this.currentPlayer === 'red' ? '黑方' : '红方';
+                    this.showCheckmateAlert(winner);
+                } else if (this.inCheck[this.currentPlayer]) {
+                    // 普通将军
                     this.showCheckAlert();
                 }
                 
@@ -648,7 +671,51 @@ class XiangqiGame {
         const rowDiff = Math.abs(toRow - fromRow);
         const colDiff = Math.abs(toCol - fromCol);
         
-        return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+        if (!((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1))) {
+            return false;
+        }
+        
+        // 检查是否会导致两个王照面（在同一条直线上直接相对）
+        // 先找到对方王的位置
+        const opponentColor = isRed ? 'black' : 'red';
+        let opponentKingPos = null;
+        
+        for (let row = 0; row < 10; row++) {
+            for (let col = 0; col < 9; col++) {
+                const targetPiece = this.board[row][col];
+                if (targetPiece && targetPiece.type === 'king' && targetPiece.color === opponentColor) {
+                    opponentKingPos = [row, col];
+                    break;
+                }
+            }
+            if (opponentKingPos) break;
+        }
+        
+        if (opponentKingPos) {
+            const [oppKingRow, oppKingCol] = opponentKingPos;
+            
+            // 如果移动后两个王在同一条直线上
+            if (toCol === oppKingCol) {
+                // 检查两个王之间是否有棋子阻挡
+                const startRow = Math.min(toRow, oppKingRow);
+                const endRow = Math.max(toRow, oppKingRow);
+                let hasPieceBetween = false;
+                
+                for (let row = startRow + 1; row < endRow; row++) {
+                    if (this.board[row][toCol] !== null) {
+                        hasPieceBetween = true;
+                        break;
+                    }
+                }
+                
+                // 如果两个王之间没有棋子阻挡，则不能这样移动
+                if (!hasPieceBetween) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     }
 
     isValidAdvisorMove(fromRow, fromCol, toRow, toCol) {
@@ -940,6 +1007,168 @@ class XiangqiGame {
                 alert.parentNode.removeChild(alert);
             }
         }, 1500);
+    }
+
+    // 检查是否绝杀
+    isCheckmate(playerColor) {
+        // 先检查是否被将军
+        const inCheck = this.isInCheck(playerColor);
+        
+        // 检查玩家的所有棋子是否都有合法走法
+        for (let row = 0; row < 10; row++) {
+            for (let col = 0; col < 9; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.color === playerColor) {
+                    // 检查这个棋子的所有可能移动
+                    for (let toRow = 0; toRow < 10; toRow++) {
+                        for (let toCol = 0; toCol < 9; toCol++) {
+                            // 检查是否是合法移动
+                            if (this.isValidMove(row, col, toRow, toCol)) {
+                                // 如果玩家未被将军，只要有一个合法移动就不是绝杀（不是困毙）
+                                if (!inCheck) {
+                                    return false;
+                                }
+                                
+                                // 如果玩家被将军，需要检查这个移动是否能解除将军
+                                // 临时执行移动来检查是否能解除将军
+                                const originalPiece = this.board[toRow][toCol];
+                                const movingPiece = this.board[row][col];
+                                this.board[toRow][toCol] = movingPiece;
+                                this.board[row][col] = null;
+                                
+                                // 更新王的位置（如果移动的是王）
+                                let originalKingPos = null;
+                                if (movingPiece.type === 'king') {
+                                    originalKingPos = this.kingPositions[playerColor];
+                                    this.kingPositions[playerColor] = [toRow, toCol];
+                                }
+                                
+                                // 检查移动后是否仍然被将军
+                                const stillInCheck = this.isInCheck(playerColor);
+                                
+                                // 恢复棋盘状态
+                                this.board[row][col] = movingPiece;
+                                this.board[toRow][toCol] = originalPiece;
+                                
+                                // 恢复王的位置
+                                if (originalKingPos) {
+                                    this.kingPositions[playerColor] = originalKingPos;
+                                }
+                                
+                                // 如果这个移动能解除将军，则不是绝杀
+                                if (!stillInCheck) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 如果没有任何移动能解除将军（被将军时）或没有任何合法移动（未被将军时），则是绝杀
+        // 这包括了困毙的情况（未被将军但无子可走）
+        return true;
+    }
+
+    // 显示绝杀提示
+    showCheckmateAlert(winner) {
+        // 创建绝杀提示元素
+        const checkmateAlert = document.createElement('div');
+        checkmateAlert.id = 'checkmate-alert';
+        checkmateAlert.className = 'checkmate-alert';
+        checkmateAlert.innerHTML = `
+            <div class="checkmate-content">
+                <div class="checkmate-icon">绝杀</div>
+                <div class="checkmate-text">${winner}获胜！</div>
+                <div class="checkmate-replay">10秒后重新播放棋局</div>
+            </div>
+        `;
+        
+        document.body.appendChild(checkmateAlert);
+        
+        // 显示提示
+        checkmateAlert.style.display = 'block';
+        
+        // 10秒后重新播放棋局
+        setTimeout(() => {
+            if (checkmateAlert.parentNode) {
+                checkmateAlert.parentNode.removeChild(checkmateAlert);
+            }
+            
+            // 开始重新播放棋局
+            this.replayGame();
+        }, 10000);
+    }
+    
+    // 重新播放棋局
+    replayGame() {
+        // 如果没有走棋历史，则直接重置游戏
+        if (this.moveHistory.length === 0) {
+            this.resetGame();
+            return;
+        }
+        
+        // 设置回放模式
+        this.isReplaying = true;
+        
+        // 重置游戏状态但保留历史记录
+        this.board = this.initializeBoard();
+        this.currentPlayer = 'red';
+        this.selectedPiece = null;
+        this.capturedPieces = { red: [], black: [] };
+        this.gameOver = false;
+        this.kingPositions = { red: [9, 4], black: [0, 4] };
+        this.inCheck = { red: false, black: false };
+        this.fullRenderNeeded = true;
+        this.renderBoard();
+        
+        // 逐步回放每一步棋
+        this.replayMove(0);
+    }
+    
+    // 回放单步棋
+    replayMove(index) {
+        // 如果已经回放完所有步骤，则重置游戏
+        if (index >= this.moveHistory.length) {
+            setTimeout(() => {
+                this.isReplaying = false;
+                this.resetGame();
+            }, 1000);
+            return;
+        }
+        
+        // 获取当前步骤
+        const move = this.moveHistory[index];
+        const [fromRow, fromCol] = move.from;
+        const [toRow, toCol] = move.to;
+        
+        // 延迟执行每一步，以便观看
+        setTimeout(() => {
+            // 执行移动
+            const piece = this.board[fromRow][fromCol];
+            this.board[toRow][toCol] = piece;
+            this.board[fromRow][fromCol] = null;
+            
+            // 更新王的位置（如果移动的是王）
+            if (piece && piece.type === 'king') {
+                this.kingPositions[piece.color] = [toRow, toCol];
+            }
+            
+            // 处理被吃掉的棋子
+            if (move.captured) {
+                this.capturedPieces[piece.color].push(move.captured);
+            }
+            
+            // 更新当前玩家
+            this.currentPlayer = this.currentPlayer === 'red' ? 'black' : 'red';
+            
+            // 重新渲染棋盘
+            this.renderBoard();
+            
+            // 继续回放下一步
+            this.replayMove(index + 1);
+        }, 1000); // 每步棋之间间隔1秒
     }
 }
 

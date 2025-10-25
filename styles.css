@@ -1,0 +1,103 @@
+/* 胜利提示样式 */
+.victory-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.victory-content {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    max-width: 90%;
+    width: 400px;
+    animation: victoryAppear 0.5s ease-out;
+}
+
+@keyframes victoryAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.victory-content h2 {
+    color: #2c3e50;
+    font-size: 3rem;  /* 增大字体 */
+    font-style: italic;  /* 意大利斜体 */
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+}
+
+#new-game-result {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+}
+
+#new-game-result:hover {
+    background: #219a52;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(39, 174, 96, 0.6);
+}
+
+#new-game-result:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(39, 174, 96, 0.4);
+}
+
+/* 移动端适配 */
+@media (max-width: 480px) {
+    .victory-content {
+        padding: 30px 20px;
+        width: 90%;
+    }
+    
+    .victory-content h2 {
+        font-size: 2.5rem;  /* 移动端适当减小字体 */
+        margin-bottom: 25px;
+    }
+    
+    #new-game-result {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .victory-content {
+        padding: 25px 15px;
+    }
+    
+    .victory-content h2 {
+        font-size: 2.2rem;  /* 小屏幕设备进一步减小字体 */
+        margin-bottom: 20px;
+    }
+    
+    #new-game-result {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+}

@@ -674,6 +674,9 @@ class ChessGame {
         this.inCheck.white = this.isKingInCheck('white');
         this.inCheck.black = this.isKingInCheck('black');
         
+        // 检查是否有合法走法（绝杀/ stalemate）
+        const currentPlayerHasMoves = this.hasLegalMoves(this.currentPlayer);
+        
         // 检查王是否被吃掉（游戏结束）
         const kings = { white: false, black: false };
         
@@ -689,13 +692,150 @@ class ChessGame {
         if (!kings.white) {
             this.gameOver = true;
             document.getElementById('game-status').textContent = '黑方胜利！';
+            this.showGameResult('Black wins!');
         } else if (!kings.black) {
             this.gameOver = true;
             document.getElementById('game-status').textContent = '白方胜利！';
+            this.showGameResult('White wins!');
+        } else if (!currentPlayerHasMoves) {
+            // 没有合法走法
+            this.gameOver = true;
+            if (this.inCheck[this.currentPlayer]) {
+                // 被将军且无合法走法 = 将死（绝杀）
+                const winner = this.currentPlayer === 'white' ? '黑方' : '白方';
+                const winnerText = this.currentPlayer === 'white' ? 'Black wins!' : 'White wins!';
+                document.getElementById('game-status').textContent = winner + '胜利！';
+                this.showGameResult(winnerText);
+            } else {
+                // 无合法走法但未被将军 = 和棋
+                document.getElementById('game-status').textContent = '和棋！';
+                this.showGameResult('Stalemate! Draw!');
+            }
         }
         
         // 更新将军提示
         this.updateCheckIndicator();
+    }
+    
+    // 检查玩家是否有任何合法走法
+    hasLegalMoves(playerColor) {
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.color === playerColor) {
+                    // 计算这个棋子的所有可能走法
+                    const moves = this.calculateValidMoves(row, col);
+                    if (moves.length > 0) {
+                        return true; // 只要有一个棋子有合法走法就返回true
+                    }
+                }
+            }
+        }
+        return false; // 没有任何合法走法
+    }
+    
+    // 显示游戏结果
+    showGameResult(message) {
+        // 创建胜利提示元素
+        const victoryElement = document.createElement('div');
+        victoryElement.id = 'victory-message';
+        victoryElement.className = 'victory-overlay';
+        victoryElement.innerHTML = `
+            <div class="victory-content">
+                <h2>${message}</h2>
+                <button id="new-game-result">新游戏</button>
+            </div>
+        `;
+        
+        // 添加到页面
+        document.body.appendChild(victoryElement);
+        
+        // 创建烟花容器
+        const fireworksContainer = document.createElement('div');
+        fireworksContainer.id = 'fireworks-container';
+        document.body.appendChild(fireworksContainer);
+        
+        // 启动烟花效果
+        this.startFireworks();
+        
+        // 添加事件监听器
+        document.getElementById('new-game-result').addEventListener('click', () => {
+            // 清理烟花效果
+            if (this.fireworkInterval) {
+                clearInterval(this.fireworkInterval);
+                this.fireworkInterval = null;
+            }
+            
+            // 移除元素
+            document.body.removeChild(victoryElement);
+            document.body.removeChild(fireworksContainer);
+            this.resetGame();
+        });
+    }
+    
+    // 启动烟花效果
+    startFireworks() {
+        const container = document.getElementById('fireworks-container');
+        if (!container) return;
+        
+        // 创建多个烟花
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                this.createFirework(container);
+            }, i * 300);
+        }
+        
+        // 持续创建烟花
+        this.fireworkInterval = setInterval(() => {
+            this.createFirework(container);
+        }, 1500);
+    }
+    
+    // 创建单个烟花
+    createFirework(container) {
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        
+        // 随机位置
+        const posX = Math.random() * window.innerWidth;
+        const posY = Math.random() * window.innerHeight * 0.6;
+        
+        firework.style.left = `${posX}px`;
+        firework.style.top = `${posY}px`;
+        
+        // 随机颜色
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        firework.style.color = color;
+        
+        // 创建简洁的烟花粒子
+        const particleCount = 8;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'firework-particle';
+            
+            // 均匀分布的角度
+            const angle = (i * Math.PI * 2 / particleCount);
+            const distance = 30 + Math.random() * 20;
+            
+            // 设置动画参数
+            const endX = Math.cos(angle) * distance;
+            const endY = Math.sin(angle) * distance;
+            
+            particle.style.setProperty('--endX', `${endX}px`);
+            particle.style.setProperty('--endY', `${endY}px`);
+            
+            firework.appendChild(particle);
+        }
+        
+        container.appendChild(firework);
+        
+        // 动画结束后移除
+        setTimeout(() => {
+            if (firework.parentNode) {
+                firework.parentNode.removeChild(firework);
+            }
+        }, 1000);
     }
     
     isKingInCheck(color) {

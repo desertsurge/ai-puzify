@@ -502,3 +502,132 @@ h1 {
         font-size: 80px;
     }
 }
+
+/* 绝杀提示样式 */
+.checkmate-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: none;
+    animation: checkmateAlertBounce 0.5s ease-out;
+}
+
+.checkmate-content {
+    background-color: transparent;
+    color: #FF0000;
+    padding: 0;
+    border-radius: 0;
+    text-align: center;
+    box-shadow: none;
+    border: none;
+}
+
+.checkmate-icon {
+    font-size: 120px;
+    font-weight: bold;
+    font-family: 'STXinwei', '华文新魏', 'KaiTi', '楷体', serif;
+    margin: 0;
+    animation: checkmateIconPulse 1s infinite;
+    /* 红字黑边效果 */
+    text-shadow: 
+        -3px -3px 0 #000,  
+        3px -3px 0 #000,
+        -3px 3px 0 #000,
+        3px 3px 0 #000,
+        -4px 0 0 #000,
+        4px 0 0 #000,
+        0 -4px 0 #000,
+        0 4px 0 #000;
+}
+
+.checkmate-text {
+    font-size: 30px;
+    font-weight: bold;
+    font-family: 'STXinwei', '华文新魏', 'KaiTi', '楷体', serif;
+    margin-top: 20px;
+    color: #FFD700;
+    text-shadow: 
+        -2px -2px 0 #000,  
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000;
+}
+
+.checkmate-replay {
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'STXinwei', '华文新魏', 'KaiTi', '楷体', serif;
+    margin-top: 20px;
+    color: #FFFFFF;
+    text-shadow: 
+        -1px -1px 0 #000,  
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+    animation: checkmateReplayPulse 2s infinite;
+}
+
+@keyframes checkmateAlertBounce {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes checkmateIconPulse {
+    0%, 100% {
+        transform: scale(1);
+        text-shadow: 
+            -3px -3px 0 #000,  
+            3px -3px 0 #000,
+            -3px 3px 0 #000,
+            3px 3px 0 #000,
+            -4px 0 0 #000,
+            4px 0 0 #000,
+            0 -4px 0 #000,
+            0 4px 0 #000;
+    }
+    50% {
+        transform: scale(1.2);
+        text-shadow: 
+            -4px -4px 0 #000,  
+            4px -4px 0 #000,
+            -4px 4px 0 #000,
+            4px 4px 0 #000,
+            -5px 0 0 #000,
+            5px 0 0 #000,
+            0 -5px 0 #000,
+            0 5px 0 #000;
+    }
+}
+
+@keyframes checkmateReplayPulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* 移动端适配 */
+@media (max-width: 700px) {
+    .checkmate-icon {
+        font-size: 80px;
+    }
+    
+    .checkmate-text {
+        font-size: 20px;
+    }
+    
+    .checkmate-replay {
+        font-size: 16px;
+    }
+}
