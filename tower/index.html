@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔防游戏 - 保护小动物</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <div class="game-title">
+                <h1>🏰 塔防游戏</h1>
+                <div class="map-name" id="mapName">森林路径</div>
+            </div>
+            <div class="game-stats">
+                <div class="stat gold-stat">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-content">
+                        <span class="label">金币</span>
+                        <span id="gold">100</span>
+                    </div>
+                </div>
+                <div class="stat health-stat">
+                    <div class="stat-icon">❤️</div>
+                    <div class="stat-content">
+                        <span class="label">生命</span>
+                        <span id="health">10</span>
+                    </div>
+                </div>
+                <div class="stat wave-stat">
+                    <div class="stat-icon">🌊</div>
+                    <div class="stat-content">
+                        <span class="label">波次</span>
+                        <span id="wave">1</span>
+                    </div>
+                </div>
+                <div class="stat score-stat">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-content">
+                        <span class="label">得分</span>
+                        <span id="score">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="game-actions">
+                <button id="settingsBtn" class="icon-btn">⚙️</button>
+                <button id="fullscreenBtn" class="icon-btn">🔳</button>
+            </div>
+        </header>
+        
+        <main class="game-main">
+            <div class="game-board" id="gameBoard">
+                <canvas id="gameCanvas"></canvas>
+                <div class="animal-health-bar">
+                    <div class="animal-container">
+                        <div class="animal-icon" id="animalIcon">🐰</div>
+                        <div class="animal-name">小兔子</div>
+                    </div>
+                    <div class="health-bar-container">
+                        <div class="health-bar" id="animalHealthBar"></div>
+                        <div class="health-text"><span id="currentHealth">10</span>/<span id="maxHealth">10</span></div>
+                    </div>
+                </div>
+                
+                <div class="game-info-panel">
+                    <div class="wave-info">
+                        <span class="wave-label">下一波敌人:</span>
+                        <span class="wave-enemies" id="nextWaveEnemies">5个基础敌人</span>
+                        <span class="wave-timer" id="waveTimer">准备就绪</span>
+                    </div>
+                </div>
+            </div>
+            
+            <aside class="game-controls">
+                <div class="tower-selection">
+                    <h3>🏹 防御塔</h3>
+                    <div class="tower-options">
+                        <div class="tower-option" data-type="archer">
+                            <div class="tower-icon">🏹</div>
+                            <div class="tower-info">
+                                <div class="tower-name">弓箭手</div>
+                                <div class="tower-cost">💰 25</div>
+                                <div class="tower-desc">远程单体攻击</div>
+                                <div class="tower-stats">
+                                    <span class="stat">⚔️ 15伤害</span>
+                                    <span class="stat">🎯 130范围</span>
+                                    <span class="stat">⚡ 1.3速度</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tower-option" data-type="mage">
+                            <div class="tower-icon">🧙</div>
+                            <div class="tower-info">
+                                <div class="tower-name">魔法师</div>
+                                <div class="tower-cost">💰 45</div>
+                                <div class="tower-desc">范围魔法攻击</div>
+                                <div class="tower-stats">
+                                    <span class="stat">⚔️ 25伤害</span>
+                                    <span class="stat">🎯 100范围</span>
+                                    <span class="stat">⚡ 0.8速度</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tower-option" data-type="cannon">
+                            <div class="tower-icon">💣</div>
+                            <div class="tower-info">
+                                <div class="tower-name">火炮</div>
+                                <div class="tower-cost">💰 70</div>
+                                <div class="tower-desc">高伤害溅射</div>
+                                <div class="tower-stats">
+                                    <span class="stat">⚔️ 50伤害</span>
+                                    <span class="stat">🎯 90范围</span>
+                                    <span class="stat">⚡ 0.6速度</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tower-option" data-type="ice">
+                            <div class="tower-icon">❄️</div>
+                            <div class="tower-info">
+                                <div class="tower-name">冰法师</div>
+                                <div class="tower-cost">💰 30</div>
+                                <div class="tower-desc">减速敌人</div>
+                                <div class="tower-stats">
+                                    <span class="stat">⚔️ 10伤害</span>
+                                    <span class="stat">🎯 110范围</span>
+                                    <span class="stat">⚡ 1.7速度</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="game-controls-buttons">
+                    <button id="startWaveBtn" class="btn btn-primary">
+                        <span class="btn-icon">🚀</span>
+                        <span class="btn-text">开始下一波</span>
+                    </button>
+                    <button id="pauseBtn" class="btn btn-secondary">
+                        <span class="btn-icon">⏸️</span>
+                        <span class="btn-text">暂停</span>
+                    </button>
+                    <button id="speedBtn" class="btn btn-secondary">
+                        <span class="btn-icon">⚡</span>
+                        <span class="btn-text">x1</span>
+                    </button>
+                    <button id="mapBtn" class="btn btn-secondary">
+                        <span class="btn-icon">🗺️</span>
+                        <span class="btn-text">切换地图</span>
+                    </button>
+                </div>
+                
+                <div class="tower-upgrade" id="towerUpgrade" style="display: none;">
+                    <h3>⬆️ 升级防御塔</h3>
+                    <div class="upgrade-info">
+                        <div class="upgrade-tower-icon" id="upgradeTowerIcon">🏹</div>
+                        <div class="upgrade-details">
+                            <div class="current-level">等级: <span id="currentLevel">1</span></div>
+                            <div class="upgrade-cost">升级: 💰 <span id="upgradeCost">30</span></div>
+                            <div class="upgrade-stats">
+                                <div class="stat-row">
+                                    <span>⚔️ 攻击力:</span>
+                                    <span><span id="currentDamage">10</span> → <span id="nextDamage">15</span></span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>⚡ 速度:</span>
+                                    <span><span id="currentSpeed">1.0</span> → <span id="nextSpeed">1.2</span></span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>🎯 范围:</span>
+                                    <span><span id="currentRange">100</span> → <span id="nextRange">110</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="upgrade-buttons">
+                        <button id="upgradeBtn" class="btn btn-primary">
+                            <span class="btn-icon">⬆️</span>
+                            <span class="btn-text">升级</span>
+                        </button>
+                        <button id="sellBtn" class="btn btn-danger">
+                            <span class="btn-icon">💰</span>
+                            <span class="btn-text">出售</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="achievements">
+                    <h3>🏆 成就</h3>
+                    <div class="achievement-list">
+                        <div class="achievement" data-achievement="firstBlood">
+                            <span class="achievement-icon">🎯</span>
+                            <span class="achievement-name">初次击杀</span>
+                        </div>
+                        <div class="achievement" data-achievement="towerMaster">
+                            <span class="achievement-icon">🏰</span>
+                            <span class="achievement-name">防御大师</span>
+                        </div>
+                        <div class="achievement" data-achievement="survivor">
+                            <span class="achievement-icon">🛡️</span>
+                            <span class="achievement-name">生存专家</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+        
+        <div class="game-over-modal" id="gameOverModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="gameOverTitle">游戏结束</h2>
+                    <div class="modal-icon" id="modalIcon">😢</div>
+                </div>
+                <div class="modal-body">
+                    <p id="gameOverMessage">小动物被击败了！</p>
+                    <div class="final-stats">
+                        <div class="stat-row">
+                            <span>⭐ 最终得分:</span>
+                            <span id="finalScore">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>🌊 到达波次:</span>
+                            <span id="finalWave">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>🏹 击败敌人:</span>
+                            <span id="enemiesKilled">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>🏰 建造防御塔:</span>
+                            <span id="towersBuilt">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="restartBtn" class="btn btn-primary">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-text">重新开始</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-modal" id="settingsModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>⚙️ 游戏设置</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-group">
+                        <label>🔊 音效音量</label>
+                        <input type="range" id="soundVolume" min="0" max="100" value="50">
+                        <span id="soundVolumeValue">50%</span>
+                    </div>
+                    <div class="setting-group">
+                        <label>🎵 背景音乐</label>
+                        <input type="range" id="musicVolume" min="0" max="100" value="30">
+                        <span id="musicVolumeValue">30%</span>
+                    </div>
+                    <div class="setting-group">
+                        <label>🖱️ 显示路径提示</label>
+                        <input type="checkbox" id="showPathHints" checked>
+                    </div>
+                    <div class="setting-group">
+                        <label>💫 显示粒子效果</label>
+                        <input type="checkbox" id="showParticles" checked>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveSettingsBtn" class="btn btn-primary">保存设置</button>
+                    <button id="closeSettingsBtn" class="btn btn-secondary">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
