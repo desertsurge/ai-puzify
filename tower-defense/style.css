@@ -1,0 +1,153 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #2c3e50;
+    font-family: Arial, sans-serif;
+}
+
+#game-container {
+    display: flex;
+    background: #34495e;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+#ui {
+    width: 200px;
+    background: #2c3e50;
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#gold {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f1c40f;
+    color: #2c3e50;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#unit-shop h3 {
+    margin-top: 0;
+    text-align: center;
+    border-bottom: 1px solid #7f8c8d;
+    padding-bottom: 10px;
+}
+
+.unit-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #3498db;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.unit-btn:hover {
+    background: #2980b9;
+}
+
+.unit-btn:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+}
+
+.unit-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    position: relative;
+}
+
+.archer-icon::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background: #e74c3c;
+    top: 14px;
+    left: 5px;
+}
+
+.archer-icon::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #9b59b6;
+    border-radius: 50%;
+    top: 10px;
+    left: 0;
+}
+
+.warrior-icon::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 15px;
+    background: #e67e22;
+    top: 7px;
+    left: 5px;
+    clip-path: polygon(0 100%, 100% 0, 100% 100%);
+}
+
+.warrior-icon::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 15px;
+    background: #7f8c8d;
+    top: 7px;
+    left: 10px;
+}
+
+.tank-icon::before {
+    content: "";
+    position: absolute;
+    width: 25px;
+    height: 15px;
+    background: #34495e;
+    top: 7px;
+    left: 2px;
+    border: 2px solid #95a5a6;
+}
+
+.tank-icon::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 8px;
+    background: #e74c3c;
+    top: 10px;
+    left: 18px;
+    border-radius: 50%;
+}
+
+#stats {
+    margin-top: 30px;
+    padding: 10px;
+    background: #16a085;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#gameCanvas {
+    background: #27ae60;
+    display: block;
+    cursor: pointer;
+}

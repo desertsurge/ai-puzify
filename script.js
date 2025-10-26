@@ -51,7 +51,7 @@ backToTopButton?.addEventListener('click', () => {
     window.scrollTo({
         top: 0,
         behavior: 'smooth'
-    });
+        });
 });
 
 // 平滑滚动
@@ -132,7 +132,7 @@ window.addEventListener('scroll', () => {
     if (!animationTriggered && aboutSection) {
         const rect = aboutSection.getBoundingClientRect();
         if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
-            animateCounter('game-count', 4);
+            animateCounter('game-count', 8);
             animateCounter('feature-count', 3);
             animateCounter('difficulty-count', 3);
             animationTriggered = true;
@@ -150,7 +150,7 @@ window.addEventListener('load', () => {
     if (aboutSection) {
         const rect = aboutSection.getBoundingClientRect();
         if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0 && !animationTriggered) {
-            animateCounter('game-count', 4);
+            animateCounter('game-count', 8);
             animateCounter('feature-count', 3);
             animateCounter('difficulty-count', 3);
             animationTriggered = true;
