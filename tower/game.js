@@ -974,6 +974,11 @@ class Enemy {
     }
 
     update() {
+        // 首先检查是否已经死亡
+        if (this.health <= 0) {
+            return false;
+        }
+        
         // 检查状态效果
         const now = Date.now();
         
@@ -991,6 +996,11 @@ class Enemy {
             
             if (now > this.burnEndTime) {
                 this.burning = false;
+            }
+            
+            // 如果燃烧导致死亡，立即返回
+            if (this.health <= 0) {
+                return false;
             }
         }
         
@@ -1287,102 +1297,7 @@ const gameState = new GameState();
 const mapSystem = new MapSystem();
 const waveSystem = new WaveSystem();
 
-// 游戏主循环
-function gameLoop() {
-    if (gameState.isPaused || gameState.isGameOver) return;
-    
-    // 清空画布并重绘地图
-    mapSystem.renderMap();
-    
-    // 绘制路径提示
-    if (gameState.pathHintsEnabled) {
-        drawPathHints();
-    }
-    
-    // 更新和渲染防御塔
-    gameState.towers.forEach(tower => {
-        tower.findTarget();
-        tower.shoot();
-        tower.render();
-    });
-    
-    // 更新和渲染敌人
-    gameState.enemies = gameState.enemies.filter(enemy => {
-        const isAlive = enemy.update();
-        if (isAlive) {
-            enemy.render();
-        }
-        return isAlive;
-    });
-    
-    // 更新和渲染投射物
-    gameState.projectiles = gameState.projectiles.filter(projectile => {
-        const isActive = projectile.update();
-        if (isActive) {
-            projectile.render();
-        }
-        return isActive;
-    });
-    
-    // 更新和渲染粒子
-    gameState.particles = gameState.particles.filter(particle => {
-        const isActive = particle.update();
-        if (isActive) {
-            particle.render();
-        }
-        return isActive;
-    });
-    
-    // 检查波次完成奖励
-    if (!gameState.isWaveActive && gameState.enemies.length === 0 && gameState.wave > 1) {
-        const wave = waveSystem.getCurrentWave();
-        const waveBonus = wave.goldBonus || (gameState.wave * 10);
-        gameState.updateGold(waveBonus);
-        gameState.updateScore(waveBonus * 5);
-        showNotification(`波次完成！获得 ${waveBonus} 金币`);
-        
-        // 无伤波次奖励
-        if (gameState.achievements.noDamage !== false) {
-            const noDamageBonus = 30 + gameState.wave * 5;
-            gameState.updateGold(noDamageBonus);
-            gameState.updateScore(200);
-            showNotification(`无伤完成波次！额外 ${noDamageBonus} 金币`);
-        }
-        
-        // 连击奖励
-        if (gameState.enemiesKilled > 10 * gameState.wave) {
-            const comboBonus = 25;
-            gameState.updateGold(comboBonus);
-            gameState.updateScore(150);
-            showNotification('连击奖励！额外 25 金币');
-        }
-    }
-    
-    // 检查波次完成
-    if (!gameState.isWaveActive && gameState.enemies.length === 0) {
-        // 波次完成，可以开始下一波
-        document.getElementById('startWaveBtn').disabled = false;
-        document.getElementById('waveTimer').textContent = '准备就绪';
-        
-        // 准备下一波信息
-        const nextWave = waveSystem.getCurrentWave();
-        let enemyText = [];
-        nextWave.enemies.forEach(group => {
-            const enemyNames = {
-                basic: '基础敌人',
-                fast: '快速敌人',
-                tank: '坦克敌人',
-                flying: '飞行敌人',
-                boss: 'Boss敌人'
-            };
-            enemyText.push(`${group.count}个${enemyNames[group.type]}`);
-        });
-        document.getElementById('nextWaveEnemies').textContent = enemyText.join(', ');
-    }
-    
-    // 更新游戏统计
-    updateGameStats();
-}
+
 
 // 绘制路径提示
 function drawPathHints() {
@@ -1962,3 +1877,461 @@ function resetGame() {
     // 重新渲染地图
     mapSystem.renderMap();
 }
+
+// 游戏主循环
+function gameLoop() {
+    if (gameState.isPaused || gameState.isGameOver) return;
+    
+    // 清空画布并重绘地图
+    mapSystem.renderMap();
+    
+    // 绘制路径提示
+    if (gameState.pathHintsEnabled) {
+        drawPathHints();
+    }
+    
+    // 更新和渲染防御塔
+    gameState.towers.forEach(tower => {
+        tower.findTarget();
+        tower.shoot();
+        tower.render();
+    });
+    
+    // 更新和渲染敌人
+    gameState.enemies = gameState.enemies.filter(enemy => {
+        const isAlive = enemy.update();
+        if (isAlive) {
+            enemy.render();
+        }
+        return isAlive;
+    });
+    
+    // 更新和渲染投射物
+    gameState.projectiles = gameState.projectiles.filter(projectile => {
+        const isActive = projectile.update();
+        if (isActive) {
+            projectile.render();
+        }
+        return isActive;
+    });
+    
+    // 更新和渲染粒子
+    gameState.particles = gameState.particles.filter(particle => {
+        const isActive = particle.update();
+        if (isActive) {
+            particle.render();
+        }
+        return isActive;
+    });
+    
+    // 检查波次完成奖励
+    if (!gameState.isWaveActive && gameState.enemies.length === 0 && gameState.wave > 1 && document.getElementById('startWaveBtn').disabled) {
+        const wave = waveSystem.getCurrentWave();
+        const waveBonus = wave.goldBonus || (gameState.wave * 10);
+        gameState.updateGold(waveBonus);
+        gameState.updateScore(waveBonus * 5);
+        showNotification(`波次完成！获得 ${waveBonus} 金币`);
+        
+        // 无伤波次奖励
+        if (gameState.achievements.noDamage !== false) {
+            const noDamageBonus = 30 + gameState.wave * 5;
+            gameState.updateGold(noDamageBonus);
+            gameState.updateScore(200);
+            showNotification(`无伤完成波次！额外 ${noDamageBonus} 金币`);
+        }
+        
+        // 连击奖励
+        if (gameState.enemiesKilled > 10 * gameState.wave) {
+            const comboBonus = 25;
+            gameState.updateGold(comboBonus);
+            gameState.updateScore(150);
+            showNotification('连击奖励！额外 25 金币');
+        }
+        
+        // 重置成就状态，防止重复奖励
+        gameState.achievements.noDamage = false;
+        
+        // 重置按钮状态，防止重复执行奖励逻辑
+        document.getElementById('startWaveBtn').disabled = false;
+    }
+    
+    // 检查波次完成
+    if (!gameState.isWaveActive && gameState.enemies.length === 0) {
+        // 检查刚刚完成了一波（不是游戏开始时）
+        if (gameState.wave > 0 && document.getElementById('startWaveBtn').disabled) {
+            // 增加波次
+            gameState.wave++;
+            document.getElementById('wave').textContent = gameState.wave;
+            showNotification(`第 ${gameState.wave} 波即将开始！`);
+        }
+        
+        // 波次完成，可以开始下一波
+        document.getElementById('startWaveBtn').disabled = false;
+        document.getElementById('waveTimer').textContent = '准备就绪';
+        
+        // 准备下一波信息
+        const nextWave = waveSystem.getCurrentWave();
+        let enemyText = [];
+        nextWave.enemies.forEach(group => {
+            const enemyNames = {
+                basic: '基础敌人',
+                fast: '快速敌人',
+                tank: '坦克敌人',
+                flying: '飞行敌人',
+                boss: 'Boss敌人'
+            };
+            enemyText.push(`${group.count}个${enemyNames[group.type]}`);
+        });
+        document.getElementById('nextWaveEnemies').textContent = enemyText.join(', ');
+    }
+    
+    // 更新游戏统计
+    updateGameStats();
+}
+
+// 绘制路径提示
+function drawPathHints() {
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const map = mapSystem.getCurrentMap();
+    
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([10, 10]);
+    
+    ctx.beginPath();
+    map.path.forEach((point, index) => {
+        if (index === 0) {
+            ctx.moveTo(point.x, point.y);
+        } else {
+            ctx.lineTo(point.x, point.y);
+        }
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+// 更新游戏统计
+function updateGameStats() {
+    // 计算DPS（每秒伤害）
+    let totalDPS = 0;
+    gameState.towers.forEach(tower => {
+        totalDPS += (tower.damage * 1000) / tower.fireRate;
+    });
+    
+    // 可以在UI中显示这些统计信息
+    // 这里只是示例，实际UI元素需要添加到HTML中
+}
+
+// 放置防御塔
+function placeTower(x, y) {
+    const map = mapSystem.getCurrentMap();
+    
+    // 检查是否在有效的防御塔位置
+    const validSpot = map.towerSpots.find(spot => {
+        const distance = Math.sqrt(Math.pow(spot.x - x, 2) + Math.pow(spot.y - y, 2));
+        return distance < 30;
+    });
+    
+    if (!validSpot) {
+        showNotification('只能在这些建造防御塔！');
+        playSound('error');
+        return;
+    }
+    
+    // 检查位置是否已被占用
+    const occupied = gameState.towers.find(tower => {
+        const distance = Math.sqrt(Math.pow(tower.x - validSpot.x, 2) + Math.pow(tower.y - validSpot.y, 2));
+        return distance < 30;
+    });
+    
+    if (occupied) {
+        showNotification('这个位置已经有防御塔了！');
+        playSound('error');
+        return;
+    }
+    
+    // 检查金币
+    const towerCosts = {
+        archer: 25,
+        mage: 45,
+        cannon: 70,
+        ice: 30
+    };
+    
+    const cost = towerCosts[gameState.selectedTowerType];
+    if (gameState.gold < cost) {
+        showNotification('金币不足！');
+        playSound('error');
+        return;
+    }
+    
+    // 创建防御塔
+    const tower = new Tower(validSpot.x, validSpot.y, gameState.selectedTowerType);
+    gameState.towers.push(tower);
+    gameState.towersBuilt++;
+    gameState.updateGold(-cost);
+    
+    // 创建放置特效
+    createPlacementEffect(validSpot.x, validSpot.y);
+    
+    // 清除选择
+    document.querySelectorAll('.tower-option').forEach(opt => opt.classList.remove('selected'));
+    gameState.selectedTowerType = null;
+    
+    playSound('placeTower');
+    showNotification(`建造了${tower.description}`);
+}
+
+// 创建放置特效
+function createPlacementEffect(x, y) {
+    if (!gameState.particlesEnabled) return;
+    
+    for (let i = 0; i < 12; i++) {
+        const angle = (Math.PI * 2 * i) / 12;
+        const speed = 2 + Math.random() * 2;
+        const particle = new Particle(
+            x,
+            y,
+            Math.cos(angle) * speed,
+            Math.sin(angle) * speed,
+            '#27ae60',
+            800
+        );
+        gameState.particles.push(particle);
+    }
+}
+
+// 显示放置预览
+function showPlacementPreview(x, y) {
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const map = mapSystem.getCurrentMap();
+    
+    // 检查是否在有效的防御塔位置
+    const validSpot = map.towerSpots.find(spot => {
+        const distance = Math.sqrt(Math.pow(spot.x - x, 2) + Math.pow(spot.y - y, 2));
+        return distance < 30;
+    });
+    
+    // 检查位置是否已被占用
+    const occupied = gameState.towers.find(tower => {
+        const distance = Math.sqrt(Math.pow(tower.x - x, 2) + Math.pow(tower.y - y, 2));
+        return distance < 30;
+    });
+    
+    // 绘制预览
+    ctx.save();
+    if (validSpot && !occupied) {
+        ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+        ctx.strokeStyle = 'rgba(0, 255, 0, 0.8)';
+    } else {
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+    }
+    
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+}
+
+// 事件监听器
+document.addEventListener('DOMContentLoaded', () => {
+    // 初始化游戏
+    mapSystem.renderMap();
+    updateMapName();
+    loadSettings();
+    
+    // 防御塔选择
+    document.querySelectorAll('.tower-option').forEach(option => {
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.tower-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            gameState.selectedTowerType = option.dataset.type;
+            gameState.selectedTower = null;
+            document.getElementById('towerUpgrade').style.display = 'none';
+            
+            // 添加选择音效
+            playSound('select');
+        });
+    });
+    
+    // 画布点击事件
+    document.getElementById('gameCanvas').addEventListener('click', (e) => {
+        const rect = e.target.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // 检查是否点击了现有防御塔
+        const clickedTower = gameState.towers.find(tower => {
+            const distance = Math.sqrt(Math.pow(tower.x - x, 2) + Math.pow(tower.y - y, 2));
+            return distance < 25;
+        });
+        
+        if (clickedTower) {
+            // 选中防御塔进行升级
+            gameState.selectedTower = clickedTower;
+            gameState.selectedTowerType = null;
+            document.querySelectorAll('.tower-option').forEach(opt => opt.classList.remove('selected'));
+            showTowerUpgrade(clickedTower);
+            playSound('select');
+        } else if (gameState.selectedTowerType) {
+            // 放置新防御塔
+            placeTower(x, y);
+        }
+    });
+    
+    // 画布悬停事件
+    document.getElementById('gameCanvas').addEventListener('mousemove', (e) => {
+        const rect = e.target.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // 显示放置预览
+        if (gameState.selectedTowerType) {
+            showPlacementPreview(x, y);
+        }
+    });
+    
+    // 开始波次
+    document.getElementById('startWaveBtn').addEventListener('click', () => {
+        waveSystem.startWave();
+        document.getElementById('startWaveBtn').disabled = true;
+        playSound('startWave');
+    });
+    
+    // 暂停游戏
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+        gameState.isPaused = !gameState.isPaused;
+        const btnText = gameState.isPaused ? '继续' : '暂停';
+        document.querySelector('#pauseBtn .btn-text').textContent = btnText;
+        const btnIcon = gameState.isPaused ? '▶️' : '⏸️';
+        document.querySelector('#pauseBtn .btn-icon').textContent = btnIcon;
+        playSound('click');
+    });
+    
+    // 游戏速度
+    document.getElementById('speedBtn').addEventListener('click', () => {
+        const speeds = [1, 2, 3];
+        const currentIndex = speeds.indexOf(gameState.gameSpeed);
+        gameState.gameSpeed = speeds[(currentIndex + 1) % speeds.length];
+        document.querySelector('#speedBtn .btn-text').textContent = `x${gameState.gameSpeed}`;
+        playSound('click');
+    });
+    
+    // 切换地图
+    document.getElementById('mapBtn').addEventListener('click', () => {
+        if (confirm('切换地图将重置当前游戏进度，确定继续吗？')) {
+            resetGame();
+            mapSystem.switchMap();
+            updateMapName();
+            playSound('click');
+        }
+    });
+    
+    // 升级防御塔
+    document.getElementById('upgradeBtn').addEventListener('click', () => {
+        if (gameState.selectedTower) {
+            if (gameState.selectedTower.upgrade()) {
+                showTowerUpgrade(gameState.selectedTower);
+                playSound('upgrade');
+            } else {
+                playSound('error');
+            }
+        }
+    });
+    
+    // 出售防御塔
+    document.getElementById('sellBtn').addEventListener('click', () => {
+        if (gameState.selectedTower) {
+            const sellPrice = gameState.selectedTower.sell();
+            gameState.towers = gameState.towers.filter(t => t !== gameState.selectedTower);
+            gameState.selectedTower = null;
+            document.getElementById('towerUpgrade').style.display = 'none';
+            playSound('sell');
+            
+            // 显示出售提示
+            showNotification(`出售获得 ${sellPrice} 金币`);
+        }
+    });
+    
+    // 设置按钮
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+        document.getElementById('settingsModal').style.display = 'flex';
+        playSound('click');
+    });
+    
+    // 全屏按钮
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+        toggleFullscreen();
+        playSound('click');
+    });
+    
+    // 保存设置
+    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+        saveSettings();
+        document.getElementById('settingsModal').style.display = 'none';
+        playSound('click');
+    });
+    
+    // 关闭设置
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+        document.getElementById('settingsModal').style.display = 'none';
+        playSound('click');
+    });
+    
+    // 设置滑块事件
+    document.getElementById('soundVolume').addEventListener('input', (e) => {
+        document.getElementById('soundVolumeValue').textContent = e.target.value + '%';
+    });
+    
+    document.getElementById('musicVolume').addEventListener('input', (e) => {
+        document.getElementById('musicVolumeValue').textContent = e.target.value + '%';
+    });
+    
+    // 重新开始
+    document.getElementById('restartBtn').addEventListener('click', () => {
+        resetGame();
+        document.getElementById('gameOverModal').style.display = 'none';
+        playSound('click');
+    });
+    
+    // 键盘快捷键
+    document.addEventListener('keydown', (e) => {
+        switch(e.key) {
+            case ' ':
+                e.preventDefault();
+                document.getElementById('pauseBtn').click();
+                break;
+            case '1':
+                document.querySelector('[data-type="archer"]').click();
+                break;
+            case '2':
+                document.querySelector('[data-type="mage"]').click();
+                break;
+            case '3':
+                document.querySelector('[data-type="cannon"]').click();
+                break;
+            case '4':
+                document.querySelector('[data-type="ice"]').click();
+                break;
+            case 'Enter':
+                if (!document.getElementById('startWaveBtn').disabled) {
+                    document.getElementById('startWaveBtn').click();
+                }
+                break;
+            case 'Escape':
+                gameState.selectedTowerType = null;
+                gameState.selectedTower = null;
+                document.querySelectorAll('.tower-option').forEach(opt => opt.classList.remove('selected'));
+                document.getElementById('towerUpgrade').style.display = 'none';
+                break;
+        }
+    });
+    
+    // 启动游戏循环
+    gameState.gameLoop = setInterval(gameLoop, 16); // 约60 FPS
+});
